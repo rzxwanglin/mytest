@@ -1,0 +1,11 @@
+plugins:
+  sonar-python:
+    enabled: true
+    config:
+      #tests_patterns:
+      # - src/test/**
+      # - app/src/test/**
+      minimum_severity: major
+exclude_paths:
+  - certs/
+  - config/
