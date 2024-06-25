@@ -21,7 +21,7 @@ def hello_world():
 
 
 @app.route('/login/put/account', methods=['POST'])
-def login_account():
+def put_account():
     """
         instagram:login:account:password:hash
         account_info 账号:密码:邮箱:邮箱二次验证
@@ -46,7 +46,6 @@ def login_cookie():
 
 @app.route('/api/get/cookie', methods=['POST'])
 def get_login_cookie():
-
     pass
 
 
