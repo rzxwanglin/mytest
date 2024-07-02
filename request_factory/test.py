@@ -1,7 +1,8 @@
 import requests
+
 proxy ={
-   'http':'http://127.0.0.1:8800',
-    'https':'http://127.0.0.1:8800'
+   'http':'http://127.0.0.1:10901',
+    'https':'http://127.0.0.1:10901'
 }
 def dz():
     # dianzam
@@ -206,3 +207,5 @@ def gz():
     # Print the response
     print(response.status_code)
     print(response.text)
+
+dz()

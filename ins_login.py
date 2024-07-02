@@ -5,7 +5,7 @@ if "ins_login" in current_path:
     current_path = current_path.replace("ins_login", "")
 
 sys.path.append(current_path)
-sys.path.append(r"D:\project\tkspider")
+
 import requests, time, traceback
 import json, random, re, io, copy, platform, os
 import email
@@ -24,18 +24,12 @@ from lxml import etree
 from loguru import logger
 import config
 from rhino_v2_utilis.handler.redis_handler import CRedisHandler
-chrome_driver_path = os.path.join(current_path, "ins_login\\chromedriver.exe")
-if platform.system() == 'Linux':
-    chrome_driver_path = os.path.join(current_path, "ins_login/chromedriver_linux")
-pro = random.choice(config.token_proxy_list)
-os.environ.setdefault('HTTP_PROXY', f'http://' + pro)
-os.environ.setdefault('HTTPS_PROXY', f'http://' + pro)
 client = CRedisHandler(**config.cookies_redis_config)
 
 class AliexpressSlider():
     def __init__(self, header=True):
         self.header = header
-        self.chrome_driver = chrome_driver_path
+
         self.ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.96 Safari/537.36'
         # self.proxy = "http://10.11.203.70:50019"
         self.proxy = "http://127.0.0.1:7890"
@@ -359,58 +353,6 @@ class AliexpressSlider():
     #         return
 
 
-    def google_verify(self):
-        self.browser.switch_to.frame(
-            self.wait.until(EC.presence_of_element_located((By.XPATH, '//iframe[@id="recaptcha-iframe"]'))))
-        time.sleep(1)
-        self.browser.switch_to.frame(
-            self.wait.until(EC.presence_of_element_located((By.XPATH, '//iframe[@title="reCAPTCHA"]'))))
-        time.sleep(1)
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[@id='recaptcha-anchor']"))).click()
-        time.sleep(2)
-        self.browser.switch_to.default_content()
-        self.browser.switch_to.frame(
-            self.wait.until(EC.presence_of_element_located((By.XPATH, '//iframe[@id="recaptcha-iframe"]'))))
-        time.sleep(1)
-        self.browser.switch_to.frame(
-            self.wait.until(EC.presence_of_element_located((By.XPATH, '//iframe[contains(@title,"reCAPTCHA ")]'))))
-        time.sleep(2)
-        self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//div[@class="button-holder audio-button-holder"]/button'))).click()
-        time.sleep(5)
-        html = etree.HTML(self.browser.page_source)
-        mp3_xpath = html.xpath('//div[@class="rc-audiochallenge-tdownload"]/a/@href')
-        if mp3_xpath:
-            mp3_link = mp3_xpath[0]
-            logger.info("google验证音频地址：" + mp3_link)
-        else:
-            logger.error("谷歌验证失败")
-        try:
-            resp = requests.get(mp3_link, timeout=5, proxies={"http": self.proxy, "https": self.proxy})
-        except:
-            logger.error("获取google语音验证码mp3数据失败")
-        self.convert_wav(resp.content)
-        verify_code = self.convert_text()
-        if not verify_code:
-            logger.error("提取音频文字信息失败")
-        self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//div//input[@type="text"]'))).click()
-        for i in verify_code:
-            ActionChains(self.browser).key_down(str(i)).perform()
-            ActionChains(self.browser).key_up(str(i)).perform()
-            time.sleep(0.1)
-        time.sleep(1)
-        self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//div[@class="verify-button-holder"]/button'))).click()
-        self.browser.switch_to.default_content()
-        time.sleep(5)
-        self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//div[@role="button"]'))).click()
-        time.sleep(20)
-        logger.info("google语音验证成功")
-        return True
-
-
     def ins_login(self, acc_hkey):
         self.login(acc_hkey)
         page_source = self.browser.page_source
@@ -444,6 +386,7 @@ class AliexpressSlider():
                             "proxy": random.choice(config.token_proxy_list),
                             "user-agent": random.choice(config.user_agent_list),
                             "cookie": "",
+                            "csrf_token": ""
                         }
         login_token = client.hkeys(config.login_token_account_hash)
         for acc_hkey in login_token:
@@ -460,6 +403,7 @@ class AliexpressSlider():
                 "cluster_id": int(client.hget(config.login_token_account_hash, acc_hkey)),
                 "user-agent": random.choice(ua),
                 "cookie": "",
+                "csrf_token":""
             }
             return acc_hkey, cookie
         if len(client.hkeys(config.token_total_hash)) < 20:
@@ -474,6 +418,7 @@ class AliexpressSlider():
                 "cluster_id": int(client.hget(config.acc_pw_hash, acc_hkey)),
                 "user-agent": random.choice(ua),
                 "cookie": "",
+                "csrf_token": ""
             }
             if client.hget("instagram_google_verify_fail", acc_hkey):
                 return "", {}
@@ -524,7 +469,7 @@ class AliexpressSlider():
         time.sleep(5)
 
 
-    def set_cookie(self, acc_hkey, cookie_info):
+    def set_cookie(self, acc_hkey, cookie_info, csrf_token):
         if not cookie_info.get("cluster_id"):
             cookie_info["cluster_id"] = int(client.hget(config.login_token_account_hash, acc_hkey))
         if client.hget(config.token_count_hash.format("total"), acc_hkey):
@@ -536,6 +481,7 @@ class AliexpressSlider():
             client.hset(config.token_count_hash.format("total"), acc_hkey, json.dumps(cookie_count_info))
         if cookie_info.get("proxy"):
             cookie_info.pop("proxy")
+        cookie_info['cookie_info'] =cookie_info
         client.hset(config.token_total_hash, acc_hkey, json.dumps(cookie_info))
         client.hdel(config.token_cookie_hash, acc_hkey)
         client.hdel(config.acc_pw_hash, acc_hkey)
@@ -624,7 +570,15 @@ class AliexpressSlider():
             for cookie_ in self.browser.get_cookies():
                 cookie_str += cookie_["name"] + "=" + cookie_["value"] + "; "
             cookie_info["cookie"] = cookie_str
-            self.set_cookie(acc_hkey, cookie_info)
+            html =self.browser.page_source
+            partem = re.compile('\{"csrf_token":"(.*?)"\}')
+            try:
+                csrf_token = re.findall(partem, html)[0]
+            except Exception as e:
+                print(e)
+                csrf_token =''
+                logger.error('！！！没有获取到！csrf_token')
+            self.set_cookie(acc_hkey, cookie_info,csrf_token)
         elif message == "账号掉线":  # 如果账号掉线，则循环到下次重新登录
             pass
         elif message == "出现验证":  # ins自动化验证， 点击账号自动化关闭按钮
@@ -635,7 +589,15 @@ class AliexpressSlider():
             for cookie in self.browser.get_cookies():
                 cookie_str += cookie["name"] + "=" + cookie["value"] + "; "
             cookie_info["cookie"] = cookie_str
-            self.set_cookie(acc_hkey, cookie_info)
+            html = self.browser.page_source
+            partem = re.compile('\{"csrf_token":"(.*?)"\}')
+            try:
+                csrf_token = re.findall(partem, html)[0]
+            except Exception as e:
+                print(e)
+                csrf_token = ''
+                logger.error('！！！没有获取到！csrf_token')
+            self.set_cookie(acc_hkey, cookie_info, csrf_token)
         elif message == "邮箱验证":  # ins账号邮箱验证， 获取邮箱验证码，并通过验证
             html = etree.HTML(self.browser.page_source)
             email_addr = html.xpath('//*[contains(text(),"@")]/text()')[0].replace("邮箱：", "").strip()
@@ -649,19 +611,26 @@ class AliexpressSlider():
                     for cookie_ in self.browser.get_cookies():
                         cookie_str += cookie_["name"] + "=" + cookie_["value"] + "; "
                     cookie_info["cookie"] = cookie_str
-                    self.set_cookie(acc_hkey, cookie_info)
+                    html = self.browser.page_source
+                    partem = re.compile('\{"csrf_token":"(.*?)"\}')
+                    try:
+                        csrf_token = re.findall(partem, html)[0]
+                    except Exception as e:
+                        print(e)
+                        csrf_token = ''
+                        logger.error('！！！没有获取到！csrf_token')
+                    self.set_cookie(acc_hkey, cookie_info, csrf_token)
                 except: # 邮箱验证失败移入失败账号队列
                     self.set_fail_cookie(acc_hkey, cookie_info, message)
             else:
                 self.set_fail_cookie(acc_hkey, cookie_info, message)
         elif message == "账号被封" or message == "手机验证":  # 账号被封或弹出绑定手机号判定为账号死号
             self.set_fail_cookie(acc_hkey, cookie_info, message)
-
         elif message == "二次验证":  # 二次验证存入谷歌验证队列
             client.hset("instagram_google_verify_fail", acc_hkey, "2fa验证")
-
         logger.info(f"登录完成后cookie: {acc_hkey}")
         time.sleep(5)
+
 
     def instagram_register(self, acc_hkey, cookie):
         try:

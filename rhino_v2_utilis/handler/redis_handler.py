@@ -497,10 +497,8 @@ class CRedisHandler(metaclass=SingletonType):
     @decorator_while_loop
     def keys(self, pattern):
         list_keys = list()
-
         if not pattern or not isinstance(pattern, str):
             return list_keys
-
         obj_redis = redis.Redis(connection_pool=self.__m_obj_pool.get_redis_pool())
         return obj_redis.keys(pattern)
 

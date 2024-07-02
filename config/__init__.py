@@ -67,45 +67,10 @@ if PROXY_ENABLE:
 
 
 
-DATA_DB_CONFIG = attribute_json("REDIS-DATA", "CONFIG", {})
-# print(DATA_DB_CONFIG)
-TASK_DB_CONFIG = attribute_json( "REDIS-TASK", "CONFIG", {})
-
-TAG_LIST = attribute_json("GLOBAL-SETTINGS", "TAG_LIST", [])
-CRAWL_COMPONENTS_CONFIG.update(**{
-        "task_host": TASK_DB_CONFIG['ip'],
-        "task_port": TASK_DB_CONFIG['port'],
-        "task_password": TASK_DB_CONFIG['password'],
-        "task_db": TASK_DB_CONFIG['db_name'],
-        "data_host": DATA_DB_CONFIG['ip'],
-        "data_port": DATA_DB_CONFIG['port'],
-        "data_db": DATA_DB_CONFIG['db_name'],
-        "data_password": DATA_DB_CONFIG['password'],
-        "project_list": TAG_LIST,
-    })
-
-
-if DATA_INTERFACE_TYPE == "redis" and DATA_INTERFACE_SSL:
-    CRAWL_COMPONENTS_CONFIG.update(**{
-        "data_redis_ssl": DATA_INTERFACE_SSL,
-    })
-
-if TASK_INTERFACE_TYPE == "redis" and TASK_INTERFACE_SSL:
-    CRAWL_COMPONENTS_CONFIG.update(**{
-        "task_redis_ssl": TASK_INTERFACE_SSL,
-    })
-
-ConfigHandler.format(**CRAWL_COMPONENTS_CONFIG)
-# 公网内网IP获取
-PUBLIC_IP = get_public_ip()
-PRIVATE_IP = get_private_ip()
-
-
 
 
 # 账号配置
 platform_token_account_hash = attribute_str("account", "platform_token_account_hash", "")
-login_token_account_hash = attribute_str("account", "login_token_account_hash", "")
 fail_token_account_hash = attribute_str("account", "fail_token_account_hash", "")
 token_total_hash = attribute_str("account", "TOKEN_TOTAL_HASH", "")
 token_total_burial_hash = attribute_str("account", "TOKEN_TOTAL_BURIAL_HASH", "")
@@ -117,8 +82,14 @@ min_sleep = attribute_int("account", "MIN_SLEEP", 2)
 burial_sleep = attribute_int("account", "BURIAL_SLEEP", 3600)
 burial_times = attribute_int("account", "BURIAL_TIMES", 1000)
 cookie_count = attribute_int("account", "COOKIE_COUNT", 1)
-cookies_redis_config = attribute_json("account", "COOKIE_REDIS_CONFIG", dict())
+
 token_proxy_list = attribute_str("account", "TOKEN_PROXY", "").split(",")
+
+
+login_token_account_hash = attribute_str("account", "login_token_account_hash", "")
+cookie_total_hash = attribute_str("account", "cookie_total_hash", "")
+cookie_total_zset = attribute_str("account", "cookie_total_zset", "")
+cookie_total_count_hash = attribute_str("account", "cookie_total_count_hash", "")
 
 
 user_agent_list = [
@@ -153,6 +124,12 @@ SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 app = Flask(__name__, template_folder='templates')
 app.static_folder = 'static'
-db = SQLAlchemy(app)
-redis_config = TASK_DB_CONFIG
-redis_client = CRedisHandler(host=redis_config['ip'], port=redis_config["port"], db=redis_config["db_name"],password=redis_config["password"])
+# db = SQLAlchemy(app)
+cookies_redis_config = attribute_json("account", "COOKIE_REDIS_CONFIG", dict())
+account_redis_client = CRedisHandler(host=cookies_redis_config['ip'], port=cookies_redis_config["port"], db=cookies_redis_config["db"],password=cookies_redis_config["password"])
+
+DATA_DB_CONFIG = attribute_json("REDIS-DATA", "CONFIG", {})
+data_redis_client = CRedisHandler(host=DATA_DB_CONFIG['ip'], port=DATA_DB_CONFIG["port"], db=DATA_DB_CONFIG["db"],password=DATA_DB_CONFIG["password"])
+
+TASK_DB_CONFIG = attribute_json( "REDIS-TASK", "CONFIG", {})
+task_redis_client = CRedisHandler(host=TASK_DB_CONFIG['ip'], port=TASK_DB_CONFIG["port"], db=TASK_DB_CONFIG["db"],password=TASK_DB_CONFIG["password"])
