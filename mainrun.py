@@ -51,10 +51,10 @@ def login_cookie():
 
 @app.route('/api/get/cookie', methods=['GET'])
 def get_login_cookie():
-    cookie = AccountRedisInterface().get_account()
+    cookie = AccountRedisInterface().get_cookie()
     print(cookie)
 
-    return  ''
+    return  jsonify(cookie)
 
 
 @app.route('/api/addtask', methods=['POST'])

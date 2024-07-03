@@ -1,14 +1,15 @@
 import requests
+import json
 
 proxy ={
-   'http':'http://127.0.0.1:10901',
-    'https':'http://127.0.0.1:10901'
+   'http':'http://127.0.0.1:8800',
+    'https':'http://127.0.0.1:8800'
 }
-def dz():
+def dz(Cookie_obj):
     # dianzam
     # Define the URL
     url = "https://www.instagram.com/graphql/query"
-
+    print(Cookie_obj['cookie'])
     # Define the headers
     headers = {
         "Accept": "*/*",
@@ -16,7 +17,8 @@ def dz():
         "Accept-Language": "zh-CN,zh;q=0.9",
         "Content-Length": "1060",
         "Content-Type": "application/x-www-form-urlencoded",
-        "Cookie": "mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid=\"16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a\"; shbts=\"1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb\"; rur=\"PRN\05467045065874\0541750759619:01f7bf54191315a40b15c564525a7148b3e23f0a28a574faacb0ee262ea7b66c267995bd\"",
+        "Cookie":str(Cookie_obj['cookie']),
+        #"Cookie": "mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid=\"16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a\"; shbts=\"1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb\"; rur=\"PRN\05467045065874\0541750759619:01f7bf54191315a40b15c564525a7148b3e23f0a28a574faacb0ee262ea7b66c267995bd\"",
         "Origin": "https://www.instagram.com",
         "Priority": "u=1, i",
         "Referer": "https://www.instagram.com/",
@@ -30,10 +32,11 @@ def dz():
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-origin",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+
+        "User-Agent": str(Cookie_obj['user-agent']),
         "X-Asbd-Id": "129477",
         "X-Bloks-Version-Id": "213e4f338be29ab2c08f8071c4feb979c6b2fe37d4124f56e5c4b00e51a21aaf",
-        "X-Csrftoken": "wizJUqALLHashqTLJ4WjiP5O19Ay36O1",
+        "X-Csrftoken": Cookie_obj['csrf_token'],
         "X-Fb-Friendly-Name": "usePolarisLikeMediaLikeMutation",
         "X-Fb-Lsd": "zRjTA0fjlIwgmiCC2Y0ip0",
         "X-Ig-App-Id": "936619743392459"
@@ -80,7 +83,7 @@ def dz():
     {"data":{"xdt_api__v1__media__media_id__like":{"__typename":"XDTEmptyRecord"}},"extensions":{"is_final":true},"status":"ok"}
     """
 
-def pl():
+def pl(Cookie_obj):
     # Define the URL
     url = "https://www.instagram.com/graphql/query"
 
@@ -89,12 +92,13 @@ def pl():
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": "zh-CN,zh;q=0.9",
-        "Content-Length": "1353",
+        "Content-Length": "1060",
         "Content-Type": "application/x-www-form-urlencoded",
-        "Cookie": 'mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid="16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a"; shbts="1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb"; rur="NHA\05467045065874\0541750760149:01f7091af7c50c6617d0aac575093720e8eb5a96b19f4d34c5768d0ca7c7141c1cdc23a7"',
+        "Cookie": str(Cookie_obj['cookie']),
+        # "Cookie": "mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid=\"16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a\"; shbts=\"1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb\"; rur=\"PRN\05467045065874\0541750759619:01f7bf54191315a40b15c564525a7148b3e23f0a28a574faacb0ee262ea7b66c267995bd\"",
         "Origin": "https://www.instagram.com",
         "Priority": "u=1, i",
-        "Referer": "https://www.instagram.com/reel/C8XOopZpHnv/",
+        "Referer": "https://www.instagram.com/",
         "Sec-Ch-Prefers-Color-Scheme": "light",
         "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
         "Sec-Ch-Ua-Full-Version-List": "\"Not/A)Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"126.0.6478.114\", \"Google Chrome\";v=\"126.0.6478.114\"",
@@ -105,12 +109,13 @@ def pl():
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-origin",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+
+        "User-Agent": str(Cookie_obj['user-agent']),
         "X-Asbd-Id": "129477",
         "X-Bloks-Version-Id": "213e4f338be29ab2c08f8071c4feb979c6b2fe37d4124f56e5c4b00e51a21aaf",
-        "X-Csrftoken": "wizJUqALLHashqTLJ4WjiP5O19Ay36O1",
-        "X-Fb-Friendly-Name": "PolarisPostCommentInputRevampedMutation",
-        "X-Fb-Lsd": "Kk_PcR3_EMqT9Lwa2J305B",
+        "X-Csrftoken": Cookie_obj['csrf_token'],
+        "X-Fb-Friendly-Name": "usePolarisLikeMediaLikeMutation",
+        "X-Fb-Lsd": "zRjTA0fjlIwgmiCC2Y0ip0",
         "X-Ig-App-Id": "936619743392459"
     }
 
@@ -156,10 +161,8 @@ def pl():
 {"errors":[{"message":"execution error","severity":"CRITICAL"}],"status":"ok"}
     """
 
-
-# dz()
 #gz
-def gz():
+def gz(Cookie_obj):
     user_id='63906350951'
     # Define the URL
     url = f"https://www.instagram.com/api/v1/friendships/create/{user_id}/"
@@ -169,9 +172,10 @@ def gz():
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": "zh-CN,zh;q=0.9",
-        "Content-Length": "105",
+        "Content-Length": "1060",
         "Content-Type": "application/x-www-form-urlencoded",
-        "Cookie": 'mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; shbid="16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a"; shbts="1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb"; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYdSfK8s_sXJuecUSGtPF0zR9VroRUy4o9BNjYc2WA; rur="NHA\05467045065874\0541750819863:01f799ec28f77c5f00b91b2808f54f135445cbbde1d2e891106b8ddd14cfce38369f0d9c"; wd=1507x604',
+        "Cookie": str(Cookie_obj['cookie']),
+        # "Cookie": "mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid=\"16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a\"; shbts=\"1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb\"; rur=\"PRN\05467045065874\0541750759619:01f7bf54191315a40b15c564525a7148b3e23f0a28a574faacb0ee262ea7b66c267995bd\"",
         "Origin": "https://www.instagram.com",
         "Priority": "u=1, i",
         "Referer": "https://www.instagram.com/",
@@ -185,13 +189,14 @@ def gz():
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-origin",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+
+        "User-Agent": str(Cookie_obj['user-agent']),
         "X-Asbd-Id": "129477",
-        "X-Csrftoken": "wizJUqALLHashqTLJ4WjiP5O19Ay36O1",
-        "X-Ig-App-Id": "936619743392459",
-        "X-Ig-Www-Claim": "hmac.AR0hX4G4uG9BXDwszW7EQFgiXisrnYu8f6lrxwmNjyUcglwI",
-        "X-Instagram-Ajax": "1014445688",
-        "X-Requested-With": "XMLHttpRequest"
+        "X-Bloks-Version-Id": "213e4f338be29ab2c08f8071c4feb979c6b2fe37d4124f56e5c4b00e51a21aaf",
+        "X-Csrftoken": Cookie_obj['csrf_token'],
+        "X-Fb-Friendly-Name": "usePolarisLikeMediaLikeMutation",
+        "X-Fb-Lsd": "zRjTA0fjlIwgmiCC2Y0ip0",
+        "X-Ig-App-Id": "936619743392459"
     }
 
     # Define the payload
@@ -208,4 +213,6 @@ def gz():
     print(response.status_code)
     print(response.text)
 
-dz()
+res = requests.get('http://127.0.0.1:5003/api/get/cookie')
+print(res.json())
+dz(json.loads(res.json()))

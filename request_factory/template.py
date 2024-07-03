@@ -22,6 +22,9 @@ class Template:
             "follower": cls.follower_template(),
             "following": cls.following_template(),
             "hashtag": cls.hashtag_template(),
+            "click_inter":cls.click_inter(),
+            "like_inter":cls.liked_inter(),
+            "comment_inter":cls.comment_inter()
         }
 
     @classmethod
@@ -217,6 +220,148 @@ class Template:
                     '&lsd={lsd}&jazoest=2980&__spin_r=1012669602&__spin_b=trunk&__spin_t=1712727979&fb_api_caller_class=RelayModern&fb_api_req_friendly_name=PolarisPostActionLoadPostQueryQuery' \
                     '&variables=%7B%22shortcode%22%3A%22{shortcode}%22%2C%22fetch_comment_count%22%3A40%2C%22parent_comment_count%22%3A24%2C%22child_comment_count%22%3A3%2C%22fetch_like_count%22%3A10%2C%22fetch_tagged_user_count%22%3Anull%2C%22fetch_preview_comment_count%22%3A2%2C%22has_threaded_comments%22%3Atrue%2C%22hoisted_comment_id%22%3Anull%2C%22hoisted_reply_id%22%3Anull%7D&server_timestamps=true&doc_id=24852649951017035'
         }
+
+    @classmethod
+    def liked_inter(cls):
+        return {
+            "url": "https://www.instagram.com/graphql/query",
+            "method": "POST",
+            "headers": {
+                "Accept": "*/*",
+                "Accept-Language": "zh-CN,zh;q=0.9",
+                "Content-Length": "1060",
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Cookie":"{cookie}",
+                #"Cookie": "mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid=\"16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a\"; shbts=\"1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb\"; rur=\"PRN\05467045065874\0541750759619:01f7bf54191315a40b15c564525a7148b3e23f0a28a574faacb0ee262ea7b66c267995bd\"",
+                "Origin": "https://www.instagram.com",
+                "Priority": "u=1, i",
+                "Referer": "https://www.instagram.com/",
+                "Sec-Ch-Prefers-Color-Scheme": "light",
+                "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+                "Sec-Ch-Ua-Full-Version-List": "\"Not/A)Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"126.0.6478.114\", \"Google Chrome\";v=\"126.0.6478.114\"",
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Model": "\"\"",
+                "Sec-Ch-Ua-Platform": "\"Windows\"",
+                "Sec-Ch-Ua-Platform-Version": "\"10.0.0\"",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Site": "same-origin",
+                "User-Agent": "{user-agent}",
+                "X-Asbd-Id": "129477",
+                "X-Bloks-Version-Id": "213e4f338be29ab2c08f8071c4feb979c6b2fe37d4124f56e5c4b00e51a21aaf",
+                "X-Csrftoken": "{csrf_token}",
+                "X-Fb-Friendly-Name": "usePolarisLikeMediaLikeMutation",
+                "X-Fb-Lsd": "zRjTA0fjlIwgmiCC2Y0ip0",
+                "X-Ig-App-Id": "936619743392459"
+            },
+            "body" : {
+                "av": "17841467016230633",
+                "__d": "www",
+                "__user": "0",
+                "__a": "1",
+                "__req": "x",
+                "__hs": "19898.HYP:instagram_web_pkg.2.1..0.1",
+                "dpr": "1",
+                "__ccg": "UNKNOWN",
+                "__rev": "1014422660",
+                "__s": "s5v8mi:3c820x:jimn0s",
+                "__hsi": "7384009069877920886",
+                "__dyn": "7xeUjG1mxu1syUbFp41twpUnwgU7SbzEdF8aUco2qwJxS0k24o0B-q1ew65xO0FE2awpUO0n24oaEnxO1ywOwv89k2C1Fwc60AEC1TwQzXwae4UaEW2G0AEcobEaU2eUlwhEe87q7U1bobpEbUGdwtUeo9UaQ0Lo6-3u2WE5B08-269wr86C1mwPwUQp1yUb9UK6V89F8C58rwYCz8KfwHw",
+                "__csr": "gjl1f4Og_6hnkQIn5Z9mDa_8lksO9bRlV2r8h4jJi3KqGGK_ymiAXHgKXGmyqHBZFlF5izeil7GtkKiQqRGq6Qh6Bzuuu9GQUhBF3ohyWBDB-FEjV99UK54mmdgyUB3EixKGKU01iEF404JUW5rw_wjFQaBo721rx210Bo0j_w1M2yz9-9xkEG2F0kcit8G4xzzA0K47S1sw2D82Xw29UG0GEkP05wge85fw2YQ0K8gxS00Ajo",
+                "__comet_req": "7",
+                "fb_dtsg": "NAcO2rlejkPZgWnpP-eC3L1BPWCuCTsKKUZLRxdSgPFBwMF3A0Kom7Q:17864970403026470:1719223576",
+                "jazoest": "26130",
+                "lsd": "zRjTA0fjlIwgmiCC2Y0ip0",
+                "__spin_r": "1014422660",
+                "__spin_b": "trunk",
+                "__spin_t": "1719223584",
+                "fb_api_caller_class": "RelayModern",
+                "fb_api_req_friendly_name": "usePolarisLikeMediaLikeMutation",
+                "variables": "{\"media_id\":\"{media_id}\"}",
+                # 3393245210130807279  3397561855460766739 视频id instagram://media?id=3397561855460766739
+                "server_timestamps": "true",
+                "doc_id": "8244673538908708"
+                }
+        }
+
+    @classmethod
+    def comment_inter(cls):
+        return {
+            "url": "https://www.instagram.com/api/v1/web/comments/{media_id}/add/",
+            "method": "POST",
+            "headers": {
+                "Accept": "*/*",
+                "Accept-Language": "zh-CN,zh;q=0.9",
+                "Content-Length": "1060",
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Cookie": "{cookie}",
+                # "Cookie": "mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid=\"16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a\"; shbts=\"1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb\"; rur=\"PRN\05467045065874\0541750759619:01f7bf54191315a40b15c564525a7148b3e23f0a28a574faacb0ee262ea7b66c267995bd\"",
+                "Origin": "https://www.instagram.com",
+                "Priority": "u=1, i",
+                "Referer": "https://www.instagram.com/",
+                "Sec-Ch-Prefers-Color-Scheme": "light",
+                "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+                "Sec-Ch-Ua-Full-Version-List": "\"Not/A)Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"126.0.6478.114\", \"Google Chrome\";v=\"126.0.6478.114\"",
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Model": "\"\"",
+                "Sec-Ch-Ua-Platform": "\"Windows\"",
+                "Sec-Ch-Ua-Platform-Version": "\"10.0.0\"",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Site": "same-origin",
+                "User-Agent": "{user-agent}",
+                "X-Asbd-Id": "129477",
+                "X-Bloks-Version-Id": "213e4f338be29ab2c08f8071c4feb979c6b2fe37d4124f56e5c4b00e51a21aaf",
+                "X-Csrftoken": "{csrf_token}",
+                "X-Fb-Friendly-Name": "usePolarisLikeMediaLikeMutation",
+                "X-Fb-Lsd": "zRjTA0fjlIwgmiCC2Y0ip0",
+                "X-Ig-App-Id": "936619743392459"
+            },
+            "body": {
+                        "comment_text":"{text}"
+                    }
+        }
+
+    @classmethod
+    def click_inter(cls):
+        return {
+            "url": "https://www.instagram.com/api/v1/friendships/create/{user_id}/",
+            "method": "POST",
+            "headers": {
+                "Accept": "*/*",
+                "Accept-Language": "zh-CN,zh;q=0.9",
+                "Content-Length": "1060",
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Cookie": "{cookie}",
+                # "Cookie": "mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid=\"16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a\"; shbts=\"1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb\"; rur=\"PRN\05467045065874\0541750759619:01f7bf54191315a40b15c564525a7148b3e23f0a28a574faacb0ee262ea7b66c267995bd\"",
+                "Origin": "https://www.instagram.com",
+                "Priority": "u=1, i",
+                "Referer": "https://www.instagram.com/",
+                "Sec-Ch-Prefers-Color-Scheme": "light",
+                "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+                "Sec-Ch-Ua-Full-Version-List": "\"Not/A)Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"126.0.6478.114\", \"Google Chrome\";v=\"126.0.6478.114\"",
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Model": "\"\"",
+                "Sec-Ch-Ua-Platform": "\"Windows\"",
+                "Sec-Ch-Ua-Platform-Version": "\"10.0.0\"",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Site": "same-origin",
+                "User-Agent": "{user-agent}",
+                "X-Asbd-Id": "129477",
+                "X-Bloks-Version-Id": "213e4f338be29ab2c08f8071c4feb979c6b2fe37d4124f56e5c4b00e51a21aaf",
+                "X-Csrftoken": "{csrf_token}",
+                "X-Fb-Friendly-Name": "usePolarisLikeMediaLikeMutation",
+                "X-Fb-Lsd": "zRjTA0fjlIwgmiCC2Y0ip0",
+                "X-Ig-App-Id": "936619743392459"
+            },
+            "body":{
+                    "container_module": "feed_timeline",
+                    "nav_chain": "PolarisFeedRoot:feedPage:3:topnav-link",
+                    "user_id": '{user_id}'
+                }
+        }
+
 
 
 if __name__ == '__main__':

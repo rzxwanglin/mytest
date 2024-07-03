@@ -13,7 +13,7 @@ import imaplib
 from email.header import decode_header
 from email.utils import parsedate_to_datetime
 
-import speech_recognition as sr
+
 from selenium import webdriver
 from chromedriver_py import binary_path
 from selenium.webdriver.common.by import By
@@ -406,6 +406,7 @@ class AliexpressSlider():
                 "csrf_token":""
             }
             return acc_hkey, cookie
+
         if len(client.hkeys(config.token_total_hash)) < 20:
             acc_keys = client.hkeys(config.acc_pw_hash)
             if len(acc_keys) <= 0:
@@ -470,6 +471,7 @@ class AliexpressSlider():
 
 
     def set_cookie(self, acc_hkey, cookie_info, csrf_token):
+        cookie_info['csrf_token'] = csrf_token
         if not cookie_info.get("cluster_id"):
             cookie_info["cluster_id"] = int(client.hget(config.login_token_account_hash, acc_hkey))
         if client.hget(config.token_count_hash.format("total"), acc_hkey):
@@ -481,7 +483,7 @@ class AliexpressSlider():
             client.hset(config.token_count_hash.format("total"), acc_hkey, json.dumps(cookie_count_info))
         if cookie_info.get("proxy"):
             cookie_info.pop("proxy")
-        cookie_info['cookie_info'] =cookie_info
+        client.zadd(config.cookie_total_zset, {str(acc_hkey): time.time()})
         client.hset(config.token_total_hash, acc_hkey, json.dumps(cookie_info))
         client.hdel(config.token_cookie_hash, acc_hkey)
         client.hdel(config.acc_pw_hash, acc_hkey)
@@ -491,12 +493,14 @@ class AliexpressSlider():
         if not client.hget("instagram_cookie_fail_hash", acc_hkey):
             cookie_count = json.loads(client.hget("instagram_cookie_total:count_hash", acc_hkey)) if client.hget(config.token_count_hash.format("total"), acc_hkey) else {}
             client.hset("instagram_cookie_fail_hash", acc_hkey, json.dumps({"message": message, "time_stamp": int(time.time()), "cookie": cookie, "cookie_count": cookie_count}, ensure_ascii=False))
-        client.hdel(config.token_count_hash.format("total"), acc_hkey)
-        client.hdel(config.token_cookie_hash, acc_hkey)
-        client.hdel(config.acc_pw_hash, acc_hkey)
-        client.hdel("instagram_google_verify_fail", acc_hkey)
-        client.hset(config.fail_token_account_hash, acc_hkey, 4)
-
+        try:
+            client.hdel(config.token_count_hash.format("total"), acc_hkey)
+            client.hdel(config.token_cookie_hash, acc_hkey)
+            client.hdel(config.acc_pw_hash, acc_hkey)
+            client.hdel("instagram_google_verify_fail", acc_hkey)
+            client.hset(config.fail_token_account_hash, acc_hkey, 4)
+        except:
+            pass
     def instagram_login(self, acc_hkey, cookie):
         try:
             self.create_browser()

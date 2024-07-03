@@ -1,5 +1,6 @@
 import config
-from config import data_redis_client
+import time
+from config import account_redis_client
 
 
 def singleton(cls):
@@ -16,7 +17,7 @@ def singleton(cls):
 @singleton
 class AccountRedisInterface:
     def __init__(self):
-        self.client =data_redis_client
+        self.client =account_redis_client
 
     def get_account(self):
         account = self.client.keys(config.login_token_account_hash)
@@ -29,8 +30,11 @@ class AccountRedisInterface:
         每次获取最下面的账号使用，并且统计次数
         :return:
         """
-
         cookie = self.client.zpopmin(config.cookie_total_zset)
-        return cookie
+        acc_hkey = cookie[0][0]
+        print(acc_hkey)
+        self.client.zadd(config.cookie_total_zset, {str(acc_hkey): time.time()+1})
+        cookie_obj = self.client.hget(config.cookie_total_hash,str(acc_hkey))
+        return cookie_obj
 
 

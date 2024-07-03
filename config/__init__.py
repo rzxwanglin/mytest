@@ -90,7 +90,7 @@ login_token_account_hash = attribute_str("account", "login_token_account_hash", 
 cookie_total_hash = attribute_str("account", "cookie_total_hash", "")
 cookie_total_zset = attribute_str("account", "cookie_total_zset", "")
 cookie_total_count_hash = attribute_str("account", "cookie_total_count_hash", "")
-
+acc_pw_hash = attribute_str("account", "ACC_PW_HASH", "")
 
 user_agent_list = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",

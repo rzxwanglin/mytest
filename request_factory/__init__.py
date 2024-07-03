@@ -1,7 +1,7 @@
 import random, copy, string, json
 from typing import Any
 from scrapy import Request, FormRequest
-from rhino_v2_crawl_instagram_by_cookie.request_factory.template import Template
+from request_factory.template import Template
 from urllib.parse import urlencode, quote
 from rhino_v2_utilis.config import ConfigHandler
 
@@ -177,3 +177,34 @@ class RequestFactory:
     @classmethod
     def get_csrftoken(cls):
         return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32))
+
+
+    @classmethod
+    def make_request_like_inter(cls, task, cookie_obj: Any):
+        req_info = copy.deepcopy(Template.template().get(task))
+        req_info["body"]['variables'] = req_info["body"]['variables'].replace("{media_id}",cookie_obj['media_id'])
+        req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        req_info["headers"]["X-Csrftoken"] =cookie_obj['csrf_token']
+        return req_info
+
+    @classmethod
+    def make_request_comment_inter(cls, task, cookie_obj: Any):
+        req_info = copy.deepcopy(Template.template().get(task))
+        req_info["body"]['comment_text'] = req_info["body"]['comment_text'].replace("{text}", cookie_obj['text'])
+        req_info['url'] = req_info['url'].replace("{media_id}", cookie_obj['media_id'])
+        req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        req_info["headers"]["X-Csrftoken"] = cookie_obj['csrf_token']
+
+        return req_info
+
+    @classmethod
+    def make_request_click_inter(cls, task, cookie_obj: Any):
+        req_info = copy.deepcopy(Template.template().get(task))
+        req_info["body"]['user_id'] = req_info["body"]['user_id'].replace("{user_id}", cookie_obj['user_id'])
+        req_info["url"] =req_info["url"].replace("{user_id}", cookie_obj['user_id'])
+        req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        req_info["headers"]["X-Csrftoken"] = cookie_obj['csrf_token']
+        return req_info
