@@ -32,7 +32,6 @@ class AccountRedisInterface:
         """
         cookie = self.client.zpopmin(config.cookie_total_zset)
         acc_hkey = cookie[0][0]
-        print(acc_hkey)
         self.client.zadd(config.cookie_total_zset, {str(acc_hkey): time.time()+1})
         cookie_obj = self.client.hget(config.cookie_total_hash,str(acc_hkey))
         return cookie_obj

@@ -28,6 +28,9 @@ class RequestFactory:
             "hashtag": cls.make_hashtag_request,
             "liked": cls.make_liked_request,
             "comment": cls.make_comment_request,
+            "like_inter":cls.make_request_like_inter,
+            "comment_inter":cls.make_request_comment_inter,
+            "click_inter":cls.make_request_click_inter,
         }
 
     @classmethod
@@ -180,19 +183,20 @@ class RequestFactory:
 
 
     @classmethod
-    def make_request_like_inter(cls, task, cookie_obj: Any):
+    def make_request_like_inter(cls, task, cookie_obj: Any,task_contain):
         req_info = copy.deepcopy(Template.template().get(task))
-        req_info["body"]['variables'] = req_info["body"]['variables'].replace("{media_id}",cookie_obj['media_id'])
+        req_info["body"]['variables'] = req_info["body"]['variables'].replace("{media_id}",task_contain['media_id'])
         req_info["headers"]["Cookie"] = cookie_obj['cookie']
         req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
         req_info["headers"]["X-Csrftoken"] =cookie_obj['csrf_token']
+
         return req_info
 
     @classmethod
-    def make_request_comment_inter(cls, task, cookie_obj: Any):
+    def make_request_comment_inter(cls, task, cookie_obj: Any,task_contain):
         req_info = copy.deepcopy(Template.template().get(task))
-        req_info["body"]['comment_text'] = req_info["body"]['comment_text'].replace("{text}", cookie_obj['text'])
-        req_info['url'] = req_info['url'].replace("{media_id}", cookie_obj['media_id'])
+        req_info["body"]['comment_text'] = req_info["body"]['comment_text'].replace("{text}", task_contain['text'])
+        req_info['url'] = req_info['url'].replace("{media_id}", task_contain['media_id'])
         req_info["headers"]["Cookie"] = cookie_obj['cookie']
         req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
         req_info["headers"]["X-Csrftoken"] = cookie_obj['csrf_token']
@@ -200,11 +204,12 @@ class RequestFactory:
         return req_info
 
     @classmethod
-    def make_request_click_inter(cls, task, cookie_obj: Any):
+    def make_request_click_inter(cls, task, cookie_obj: Any,task_contain):
         req_info = copy.deepcopy(Template.template().get(task))
-        req_info["body"]['user_id'] = req_info["body"]['user_id'].replace("{user_id}", cookie_obj['user_id'])
-        req_info["url"] =req_info["url"].replace("{user_id}", cookie_obj['user_id'])
+        req_info["body"]['user_id'] = req_info["body"]['user_id'].replace("{user_id}", task_contain['user_id'])
+        req_info["url"] =req_info["url"].replace("{user_id}", task_contain['user_id'])
         req_info["headers"]["Cookie"] = cookie_obj['cookie']
         req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
         req_info["headers"]["X-Csrftoken"] = cookie_obj['csrf_token']
+
         return req_info

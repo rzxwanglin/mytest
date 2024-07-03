@@ -486,7 +486,7 @@ class AliexpressSlider():
         client.zadd(config.cookie_total_zset, {str(acc_hkey): time.time()})
         client.hset(config.token_total_hash, acc_hkey, json.dumps(cookie_info))
         client.hdel(config.token_cookie_hash, acc_hkey)
-        client.hdel(config.acc_pw_hash, acc_hkey)
+        #client.hdel(config.acc_pw_hash, acc_hkey)
         client.hdel("instagram_google_verify_fail", acc_hkey)
 
     def set_fail_cookie(self, acc_hkey, cookie, message):
