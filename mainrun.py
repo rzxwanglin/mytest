@@ -65,7 +65,12 @@ def api_add_task():
             ,"task_contain": {"seed":"https://ddd","text":"hello"} #seed_type :帖子 或者 作者主页
         }
     """
+
     task_name = request.form['task_name']
+    user_name = request.form['user_name']
+    task_details = request.form["task_details"]
+
+    print(task_details)
     if task_name == '点赞':
         task_name = 'like_inter'
         task_type = 'inter'
@@ -79,7 +84,7 @@ def api_add_task():
         return '请检查任务类型【点赞、关注、评论】'
     task_type = task_type
     task_status = 'run'  # end
-    user_name = request.form['user_name']
+
     task_created_date = time.time()
     task_info = {
             "task_name": task_name   #1、点赞2、评论3、关注4、发帖子5、采集帖子观看数量6、点赞数量
@@ -87,8 +92,11 @@ def api_add_task():
             ,"task_status": task_status #add run end
             ,"task_created_date": task_created_date #时间戳
             ,"user_name": user_name # tag
-        }
-    task_redis_client.lpush(f"instagram:task", task_info)
+            ,"task_details":task_details # 任务细节
+    }
+    # todo 添加到配置表中
+    task_redis_client.lpush(f"instagram:task", json.dumps(task_info))
+    task_redis_client.lpush(f"instagram:task:history:{user_name}", json.dumps(task_info))
     """
     将task_info 转成json
     提取对应的的信息，入库到redis

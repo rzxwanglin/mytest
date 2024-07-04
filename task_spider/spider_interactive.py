@@ -37,6 +37,7 @@ class SpiderInteractive(object):
                     logger.info(f"任务{task_info.get('task_name')} 执行完成！，完成响应：{response}")
                 else:
                     # 任务回滚！
+                    logger.info(f"任务{task_info.get('task_name')} 异常回滚！")
                     task_redis_client.lpush('instagram:task',task_info)
             except Exception as e:
                 logger.error(e)

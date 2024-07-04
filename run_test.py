@@ -3,18 +3,17 @@ import json
 from request_factory import RequestFactory
 from task_spider.spider_interactive import SpiderInteractive
 
-spider = SpiderInteractive().get_task()
-print(spider)
+
 #
-# proxy ={
-#    'http':'http://127.0.0.1:8800',
-#     'https':'http://127.0.0.1:8800'
-# }
-#
-# res = requests.get('http://127.0.0.1:5003/api/get/cookie')
-# print(res.json())
-# cookie_obj =json.loads(res.json())
-#
+proxy ={
+   'http':'http://127.0.0.1:8800',
+    'https':'http://127.0.0.1:8800'
+}
+
+res = requests.get('http://127.0.0.1:5003/api/get/cookie')
+print(res.json())
+cookie_obj =json.loads(res.json())
+
 #
 #
 # task = 'like_inter'
@@ -37,10 +36,11 @@ print(spider)
 # res =requests.post(url=req_info['url'],headers=req_info['headers'],data=req_info['body'],proxies=proxy)
 # print(res.text)
 
-
-# task = 'click_inter'
-# cookie_obj['user_id'] ='62986798468'
-# req_info= RequestFactory.make_request_click_inter(task,cookie_obj)
-# print(req_info)
-# res =requests.post(url=req_info['url'], headers=req_info['headers'], data=req_info['body'], proxies=proxy)
-# print(res.text)
+task = 'click_inter'
+task_contain={
+    'user_id':'65862573148'
+}
+req_info= RequestFactory.make_request_click_inter(task,cookie_obj,task_contain)
+print(req_info)
+res =requests.post(url=req_info['url'], headers=req_info['headers'], data=req_info['body'])
+print(res.text)
