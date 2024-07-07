@@ -1,0 +1,21 @@
+平台搭建：
+    1、爬虫平台：
+        用户注册
+        爬虫任务下单（任务进度，数据回传显示）
+        群控项目对接 脚本市场
+        项目定制
+        简单api 爬虫，输入网址，需要获取什么内容，然后格式化输出内容
+
+    2、爬虫项目对接平台（多爬虫项目对接）
+        爬虫分类：1、交互爬虫 2、数据爬虫
+        instagram facebook telegram 推特 YouTube tiktok whatsapp
+        处理 账号逻辑 任务获取 数据回传
+
+
+
+总结：
+    百万级数据存储，爬虫系统架构
+    scrapy、redis、asycio、git、docker、kafka（未学）
+    深度学习一下原理？面试准备
+    项目巩固编写：instagram facebook telegram 推特 YouTube tiktok whatsapp
+    app逆向 web逆向

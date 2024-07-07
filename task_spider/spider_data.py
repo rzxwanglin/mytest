@@ -6,42 +6,51 @@ from loguru import logger
 from config import task_redis_client
 from utilis.account_redis_interface import AccountRedisInterface
 from request_factory import RequestFactory
-class SpiderInteractive(object):
+class SpiderData(object):
     """
-    二级爬虫任务
+    一级爬虫任务
     """
     def __init__(self):
-        logger.info('初始化instagram交互爬虫')
+        logger.info('初始化instagram数据爬虫')
 
     def get_task(self):
         while True:
-            task_info = task_redis_client.lpop(config.task_inter)
+            task_info = task_redis_client.lpop(config.task_data)
             if task_info:
-                break
+                return json.loads(task_info)
             else:
                 time.sleep(2)
 
-        return json.loads(task_info)
-
     def get_handler(self):
-        task_info = self.get_task()
+        data_dict = self.get_task()
         cookie_obj = AccountRedisInterface().get_cookie()
         if not cookie_obj:
-            return False, task_info, None
-        task_name = task_info.get('task_name')
-        task_details =task_info.get("task_details")
-        req_info = RequestFactory.factory()[task_name](task_name,cookie_obj,task_details)
+            return False, data_dict, None
+        task_name = data_dict['task_name']
+        seed = data_dict.get("seed", None)
+        if task_name in ["liked"]:
+            # todo post_id
+            post_id = data_dict.get("source_post", {}).get("id")
+            req_info = RequestFactory.factory()[task_name](task_name, cookie_obj, post_id)
+
+        elif task_name in ["comment", "post", "user", "following", "follower", "hashtag", "search", "post_id"]:
+            req_info = RequestFactory.factory()[task_name](task_name, cookie_obj, seed)
+        else:
+            return
         # todo 优化代码
         if config.use_proxy:
             proxie = config.proxies
-            res =requests.post(url=req_info['url'],headers=req_info['headers'],data=req_info['body'],proxies=proxie)
+            res =requests.request(method=req_info['method'],url=req_info['url'],headers=req_info['headers'],data=req_info.get('body',''),proxies=proxie)
+
         else:
-            res = requests.post(url=req_info['url'], headers=req_info['headers'], data=req_info['body'])
+            res = requests.request(method=req_info['method'], url=req_info['url'], headers=req_info['headers'],
+                                   data=req_info.get('body', ''))
+
         if res.status_code == 200 and '"status":"ok"' in res.text:
-            return True,task_info,res.text
+            return True,data_dict,res.text
         else:
             logger.error("!!任务执行异常！！")
-            return False,task_info,None
+            return False,data_dict,None
 
     def run(self):
         while True:
@@ -53,7 +62,7 @@ class SpiderInteractive(object):
                     # 任务回滚！
                     # todo 判断是否是账号失效，如果是账号失效要redis 直接删除 instagram_cookie_total_hash 中对应多key  以及instagram_cookie_total_zest 中多key
                     logger.info(f"任务{task_info.get('task_name')} 异常回滚！")
-                    task_redis_client.lpush(config.task_inter, json.dumps(task_info))
+                    task_redis_client.lpush(config.task_data, json.dumps(task_info))
             except Exception as e:
                 logger.error(e)
             time.sleep(2)

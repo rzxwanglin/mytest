@@ -17,7 +17,7 @@ def singleton(cls):
 @singleton
 class AccountRedisInterface:
     def __init__(self):
-        self.client =account_redis_client
+        self.client = account_redis_client
 
     def get_account(self):
         account = self.client.keys(config.login_token_account_hash)
@@ -31,9 +31,19 @@ class AccountRedisInterface:
         :return:
         """
         cookie = self.client.zpopmin(config.cookie_total_zset)
+        if not cookie:
+            return None
         acc_hkey = cookie[0][0]
-        self.client.zadd(config.cookie_total_zset, {str(acc_hkey): time.time()+1})
-        cookie_obj = self.client.hget(config.cookie_total_hash,str(acc_hkey))
+        self.client.zadd(config.cookie_total_zset, {str(acc_hkey): time.time() + 1})
+        cookie_obj = self.client.hget(config.cookie_total_hash, str(acc_hkey))
+
+        # 统计 cookie 被获取多次数
+        acc_hkey_count = self.client.hget(config.cookie_total_count_hash, acc_hkey)
+        if not acc_hkey_count:
+            requests_count = 1
+        else:
+            requests_count = acc_hkey_count.get('requests_count', 0) + 1
+        self.client.hset(config.cookie_total_count_hash, acc_hkey_count, {'requests_count': requests_count})
         return cookie_obj
 
 

@@ -20,7 +20,7 @@ def hello_world():
     return 'Hello World!'
 
 
-@app.route('/login/put/account', methods=['POST'])
+@app.route('/api/put/account', methods=['POST'])
 def put_account():
     """
         instagram:login:account:password:hash
@@ -29,21 +29,12 @@ def put_account():
     # 判断账号是否符合条件
     user = request.form['user']
     account_info = request.form['account_info']
-    account_redis_client.hset('instagram:login:account:password:hash',account_info,user)
-    return '添加完成！'
+    if len(account_info.split(':')) == 4:
+        account_redis_client.hset('instagram:login:account:password:hash',account_info,user)
+        return '添加完成！'
+    else:
+        return f'请检查格式:{account_info}'
 
-@app.route('/api/put/cookie', methods=['POST'])
-def login_cookie():
-    """
-        拿到账号 密码 构造 user-task
-        上传redis
-    """
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        cookie = request.form['cookie']
-
-    return ''
 
 @app.route('/api/get/cookie', methods=['GET'])
 def get_login_cookie():
@@ -52,8 +43,9 @@ def get_login_cookie():
     return jsonify(cookie)
 
 
-@app.route('/api/addtask', methods=['POST'])
-def api_add_task():
+
+@app.route('/api/inter/addtask', methods=['POST'])
+def inter_add_task():
     """
     task_info =
         {
@@ -64,11 +56,14 @@ def api_add_task():
             ,"task_created": "" tag
             ,"task_contain": {"seed":"https://ddd","text":"hello"} #seed_type :帖子 或者 作者主页
         }
-    """
 
-    task_name = request.form['task_name']
-    user_name = request.form['user_name']
-    task_details = request.form["task_details"]
+        还应该将用户加入到，用户key中做持久化处理
+
+    """
+    from_user_json = request.get_json()
+    task_name = from_user_json['task_name']
+    user_name = from_user_json['user_name']
+    task_details = from_user_json["task_details"]
 
     print(task_details)
     if task_name == '点赞':
@@ -87,7 +82,8 @@ def api_add_task():
 
     task_created_date = time.time()
     task_info = {
-            "task_name": task_name   #1、点赞2、评论3、关注4、发帖子5、采集帖子观看数量6、点赞数量
+            "id":"1008611" # 随机 7位
+            ,"task_name": task_name   #1、点赞2、评论3、关注4、发帖子5、采集帖子观看数量6、点赞数量
             ,"task_type": task_type # action ,caiji
             ,"task_status": task_status #add run end
             ,"task_created_date": task_created_date #时间戳
@@ -95,14 +91,76 @@ def api_add_task():
             ,"task_details":task_details # 任务细节
     }
     # todo 添加到配置表中
-    task_redis_client.lpush(f"instagram:task", json.dumps(task_info))
+    task_redis_client.lpush(config.task_inter, json.dumps(task_info))
+    #判断用户是否在表中
+    user = json.loads(task_redis_client.hget("instagram:users",user_name))
+    if user:
+        use_cookie_count =user.get("use_cookie_count",0)+1
+        task_count = user.get("task_count",0)+1
+        task_redis_client.hset("instagram:users", user_name,json.dumps({"use_cookie_count":use_cookie_count,"task_count":task_count}))
+    else:
+        task_redis_client.hset("instagram:users", user_name, json.dumps({"use_cookie_count":1,"task_count":1}))
     task_redis_client.lpush(f"instagram:task:history:{user_name}", json.dumps(task_info))
-    """
-    将task_info 转成json
-    提取对应的的信息，入库到redis
-    """
+
+
     return '任务上传完毕'
 
+@app.route('/api/data/addtask', methods=['POST'])
+def data_add_task():
+    """
+    {'task_info': {'id': '9470055', 'type': 'instagram','user':'test001',
+                   'params': {'seed': ['kl_nagarkoti_5_'],
+                              'seed_type': 'user',
+                              'task': ['user', 'follower', 'following', 'post', 'liked', 'comment'],
+                              'limit': {
+                                       'user': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                'after': '2023-09-01 00:00:00 +0800'},
+                                       'follower': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                    'after': '2023-09-01 00:00:00 +0800'},
+                                       'following': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                     'after': '2023-09-01 00:00:00 +0800'},
+                                       'post': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                'after': '2023-09-01 00:00:00 +0800'},
+                                       'liked': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                 'after': '2023-09-01 00:00:00 +0800'},
+                                       'comment': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                   'after': '2023-09-01 00:00:00 +0800'}
+                                            }
+                                        }
+                        }
+    """
+    task_info = {'task_info': {'id': '9470055', 'type': 'instagram','user':'',
+                              'params': {'seed': [],
+                              'seed_type': 'user',
+                              'task': [],
+                              'limit': {
+                                       'user': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                'after': '2023-09-01 00:00:00 +0800'},
+                                       'follower': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                    'after': '2023-09-01 00:00:00 +0800'},
+                                       'following': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                     'after': '2023-09-01 00:00:00 +0800'},
+                                       'post': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                'after': '2023-09-01 00:00:00 +0800'},
+                                       'liked': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                 'after': '2023-09-01 00:00:00 +0800'},
+                                       'comment': {'count': 50, 'crawl_image': False, 'frequencyAuto': 0,
+                                                   'after': '2023-09-01 00:00:00 +0800'}
+                                            }
+                                        }
+                               }}
+    from_user_json = request.get_json()
+    task_info['task_info']['user'] = from_user_json['user']
+    task_info['task_info']['params']['seed'] = [from_user_json['seed']]
+    task_info['task_info']['params']['task'] = from_user_json["task"]
+    task_redis_client.lpush(config.task_info_name, json.dumps(task_info))
+    return '任务上传完毕'
+
+@app.route('/test',methods=['POST'])
+def test_post():
+    request_data = request.get_json()
+    print(request_data)
+    return '1'
 
 if __name__ == "__main__":
     logger.add(

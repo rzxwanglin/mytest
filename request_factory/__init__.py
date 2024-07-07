@@ -34,14 +34,13 @@ class RequestFactory:
         }
 
     @classmethod
-    def make_user_request(cls, task_info: dict, task: any, user_name: string, meta: dict, spider_self: Any):
+    def make_user_request(cls, task, cookie_obj,user_name):
+        if not isinstance(cookie_obj, dict):
+            cookie_obj = json.loads(cookie_obj)
         req_info = copy.deepcopy(Template.template().get(task))
+        req_info["headers"]["Cookie"] = cookie_obj['cookie']
         req_info["url"] = req_info["url"].format(**{"user_name": user_name})
-        return Request(
-            dont_filter=True,
-            meta=meta,
-            **req_info
-        )
+        return req_info
 
     @classmethod
     def make_post_request(cls, task_info: dict, task: any, user_id: string, meta: dict, spider_self: Any):
@@ -185,7 +184,9 @@ class RequestFactory:
     @classmethod
     def make_request_like_inter(cls, task, cookie_obj: Any,task_contain):
         if not isinstance(task_contain, dict):
-            task_contain =json.loads(task_contain)
+            task_contain = json.loads(task_contain)
+        if not isinstance(cookie_obj, dict):
+            cookie_obj = json.loads(cookie_obj)
         req_info = copy.deepcopy(Template.template().get(task))
         req_info["body"]['variables'] = req_info["body"]['variables'].replace("{media_id}",task_contain['media_id'])
         req_info["headers"]["Cookie"] = cookie_obj['cookie']
@@ -196,7 +197,9 @@ class RequestFactory:
     @classmethod
     def make_request_comment_inter(cls, task, cookie_obj: Any,task_contain):
         if not isinstance(task_contain, dict):
-            task_contain =json.loads(task_contain)
+            task_contain = json.loads(task_contain)
+        if not isinstance(cookie_obj, dict):
+            cookie_obj = json.loads(cookie_obj)
         req_info = copy.deepcopy(Template.template().get(task))
         req_info["body"]['comment_text'] = req_info["body"]['comment_text'].replace("{text}", task_contain['text'])
         req_info['url'] = req_info['url'].replace("{media_id}", task_contain['media_id'])
@@ -210,6 +213,8 @@ class RequestFactory:
     def make_request_click_inter(cls, task, cookie_obj: Any,task_contain):
         if not isinstance(task_contain, dict):
             task_contain =json.loads(task_contain)
+        if not isinstance(cookie_obj, dict):
+            cookie_obj =json.loads(cookie_obj)
         req_info = copy.deepcopy(Template.template().get(task))
         req_info["body"]['user_id'] = req_info["body"]['user_id'].replace("{user_id}", task_contain['user_id'])
         req_info["url"] =req_info["url"].replace("{user_id}", task_contain['user_id'])

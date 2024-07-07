@@ -388,6 +388,7 @@ class AliexpressSlider():
                             "cookie": "",
                             "csrf_token": ""
                         }
+
         login_token = client.hkeys(config.login_token_account_hash)
         for acc_hkey in login_token:
             fail_hash = client.hget("instagram_cookie_fail_hash", acc_hkey)

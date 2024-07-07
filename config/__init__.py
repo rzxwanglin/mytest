@@ -70,14 +70,6 @@ if PROXY_ENABLE:
 
 
 # 账号配置
-platform_token_account_hash = attribute_str("account", "platform_token_account_hash", "")
-fail_token_account_hash = attribute_str("account", "fail_token_account_hash", "")
-token_total_hash = attribute_str("account", "TOKEN_TOTAL_HASH", "")
-token_total_burial_hash = attribute_str("account", "TOKEN_TOTAL_BURIAL_HASH", "")
-token_cookie_hash = attribute_str("account", "COOKIE_HASH", "")
-token_zset = attribute_str("account", "TOKEN_ZSET", "")
-token_hash = attribute_str("account", "TOKEN_HASH", "")
-token_count_hash = attribute_str("account", "TOKEN_COUNT_HASH", "")
 min_sleep = attribute_int("account", "MIN_SLEEP", 2)
 burial_sleep = attribute_int("account", "BURIAL_SLEEP", 3600)
 burial_times = attribute_int("account", "BURIAL_TIMES", 1000)
@@ -133,3 +125,13 @@ data_redis_client = CRedisHandler(host=DATA_DB_CONFIG['ip'], port=DATA_DB_CONFIG
 
 TASK_DB_CONFIG = attribute_json( "REDIS-TASK", "CONFIG", {})
 task_redis_client = CRedisHandler(host=TASK_DB_CONFIG['ip'], port=TASK_DB_CONFIG["port"], db=TASK_DB_CONFIG["db"],password=TASK_DB_CONFIG["password"])
+
+
+use_proxy = attribute_bool('PROXY','USE_PROXY', False)
+proxies = attribute_json('PROXY','PROXY_LIST',{"http":"http://127.0.0.1:8800","https":"https://127.0.0.1:8800"})
+
+# 二级任务
+task_inter = attribute_str('task','task_inter','')
+task_data = attribute_str('task','task_data','')
+instagram_users = attribute_str('task','instagram_users','')
+task_info_name = attribute_str('task','task_info_name','')
