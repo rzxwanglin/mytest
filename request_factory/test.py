@@ -1,6 +1,6 @@
 import requests
 import json
-
+import time
 proxy ={
    'http':'http://127.0.0.1:8800',
     'https':'http://127.0.0.1:8800'
@@ -213,6 +213,105 @@ def gz(Cookie_obj):
     print(response.status_code)
     print(response.text)
 
-res = requests.get('http://127.0.0.1:5003/api/get/cookie')
-print(res.json())
-dz(json.loads(res.json()))
+
+def ft(Cookie_obj,image_path,caption):
+    # 获取当前时间戳（单位：秒）
+    timestamp = int(time.time())
+    # 将秒转换为毫秒
+    timestamp_ms = timestamp * 1000
+    url = f'https://i.instagram.com/rupload_igphoto/fb_uploader_{timestamp_ms}'
+    headers = {
+        'accept': '*/*',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'zh-CN,zh;q=0.9',
+        'content-length': '63038',
+        'content-type': 'image/jpeg',
+        'Cookie': str(Cookie_obj['cookie']),
+        'offset': '0',
+        'origin': 'https://www.instagram.com',
+        'referer': 'https://www.instagram.com/accounts/onetap/?next=%2F',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-site',
+        "User-Agent": str(Cookie_obj['user-agent']),
+        'x-asbd-id': '129477',
+        'x-entity-length': '63038',
+        'x-entity-name': 'fb_uploader_1720410997954',
+        'x-entity-type': 'image/png',
+        'x-ig-app-id': '936619743392459',
+        'x-instagram-ajax': '1014714971',
+        'x-instagram-rupload-params': '{"media_type":1,"upload_id":"1720410997954","upload_media_height":546,"upload_media_width":546}'
+    }
+    with open(image_path, 'rb') as f:
+        image_data = f.read()
+    # Sending POST request
+    response = requests.post(url, headers=headers, data=image_data)
+    # Checking the response
+    if response.status_code == 200:
+        print("Image upload successful!")
+        print("Response JSON:", response.json())
+    else:
+        print(f"Image upload failed with status code {response.status_code}")
+        print("Response content:", response.text)
+    upload_id = response.json()['upload_id']
+
+    headers = {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "Content-Length": "1060",
+        "Cookie": str(Cookie_obj['cookie']),
+        # "Cookie": "mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; wd=1020x604; csrftoken=wizJUqALLHashqTLJ4WjiP5O19Ay36O1; ds_user_id=67045065874; sessionid=67045065874%3AjuyYemzRhN7wXJ%3A11%3AAYcA63mwgzpf4kJ1FEqG4pgIJWEEEdkf7DQ7wbiwOw; shbid=\"16705\05467045065874\0541750759582:01f7162f81b050377930728836f1052b37975aed09acb9e66cd12d7aea9cffc4746e290a\"; shbts=\"1719223582\05467045065874\0541750759582:01f7e7a7cc10426915aeb8b07a877037b261789f55b55d41f8d6bf31352444df7c2457bb\"; rur=\"PRN\05467045065874\0541750759619:01f7bf54191315a40b15c564525a7148b3e23f0a28a574faacb0ee262ea7b66c267995bd\"",
+        "Origin": "https://www.instagram.com",
+        "Priority": "u=1, i",
+        "Referer": "https://www.instagram.com/",
+        "Sec-Ch-Prefers-Color-Scheme": "light",
+        "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+        "Sec-Ch-Ua-Full-Version-List": "\"Not/A)Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"126.0.6478.114\", \"Google Chrome\";v=\"126.0.6478.114\"",
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Model": "\"\"",
+        "Sec-Ch-Ua-Platform": "\"Windows\"",
+        "Sec-Ch-Ua-Platform-Version": "\"10.0.0\"",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "User-Agent": str(Cookie_obj['user-agent']),
+        "X-Asbd-Id": "129477",
+        "X-Bloks-Version-Id": "213e4f338be29ab2c08f8071c4feb979c6b2fe37d4124f56e5c4b00e51a21aaf",
+        "X-Csrftoken": Cookie_obj['csrf_token'],
+        "X-Fb-Friendly-Name": "usePolarisLikeMediaLikeMutation",
+        "X-Fb-Lsd": "zRjTA0fjlIwgmiCC2Y0ip0",
+        "X-Ig-App-Id": "936619743392459"
+    }
+    url = 'https://www.instagram.com/api/v1/media/configure/'
+    # 请求的 body 数据，根据你的需求设置
+    data = {
+        'archive_only': 'false',
+        'caption': caption,
+        'clips_share_preview_to_feed': '1',
+        'disable_comments': '0',
+        'disable_oa_reuse': 'false',
+        'igtv_share_preview_to_feed': '1',
+        'is_meta_only_post': '0',
+        'is_unified_video': '1',
+        'like_and_view_counts_disabled': '0',
+        'source_type': 'library',
+        'upload_id': upload_id,
+        'video_subtitles_enabled': '0'
+    }
+
+    # 发送 POST 请求
+    response = requests.post(url, headers=headers, data=data,proxies=proxy)
+
+    # 检查响应
+    if response.status_code == 200:
+        print("Request successful!")
+        print("Response:", response.text)
+    else:
+        print(f"Request failed with status code {response.status_code}")
+        print("Response content:", response.text)
+
+# res = requests.get('http://127.0.0.1:5003/api/get/cookie',proxies=proxy)
+# print(res.json())
+cookie = {"cluster_id": 1, "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.5414.120 Safari/537.36", "cookie": "rur=\"EAG\\05467006437644\\0541751527639:01f74b9948ce6c92d768417a7f92ebe6da0385eaef6222afd5b51de82b82e4c09669bcfe\"; sessionid=67006437644%3AuyRg0zCKOgWzMb%3A24%3AAYfLgCIgvLUR7MtNpb28e0inb-AFtOS2-GJYzj-IyA; ds_user_id=67006437644; csrftoken=esZnGcfmBvZtXkrqiyhC6qvcy1SAjnO7; datr=Ff2EZlRMi0NhgBRHcRWMllTX; ig_did=0A96FA10-C0D1-449A-9B9A-ED5A50AD48DF; ig_nrcb=1; mid=ZoT9FQALAAGq-utESwuFRnz4-kNO; wd=1920x953; ", "csrf_token": "esZnGcfmBvZtXkrqiyhC6qvcy1SAjnO7"}
+ft(cookie,r'C:\Users\Administrator\Desktop\ccc2.png','good')
