@@ -1,12 +1,18 @@
-import markdown2
-import pdfkit
+import asyncio
+import websockets
 
-# 读取 Markdown 文件内容
-with open('api接口.md', 'r', encoding='utf-8') as md_file:
-    md_content = md_file.read()
+async def connect_to_websocket(uri):
+    async with websockets.connect(uri) as websocket:
+        # 发送消息
+        await websocket.send("Hello, WebSocket!")
+        print("Message sent to the server.")
 
-# 将 Markdown 内容转换为 HTML
-html_content = markdown2.markdown(md_content)
+        # 接收消息
+        response = await websocket.recv()
+        print(f"Message received from server: {response}")
 
-# 将 HTML 内容转换为 PDF 并保存
-pdfkit.from_string(html_content, 'output.pdf')
+# WebSocket服务器的URI
+uri = "ws://localhost:8765"
+
+# 运行WebSocket客户端
+asyncio.get_event_loop().run_until_complete(connect_to_websocket(uri))
