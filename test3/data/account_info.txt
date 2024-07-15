@@ -1,0 +1,10 @@
+window.send_ = this.ws.send
+this.ws.send = function(){
+
+    debugger;
+    window.send_(arguments)
+}
+
+ws.send(it,
+
+

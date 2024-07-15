@@ -92,7 +92,9 @@ headers= {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
 }
 proxy = 'http://127.0.0.1:10900'
-ws = websocket.create_connection(url=url,headers=headers, proxy=proxy,timeout=15)
+ws = websockets.connect(uri=url,headers=headers, proxy=proxy,timeout=15)
+
+print(ws)
 print(ws.recv())
 a_ = {
     "ignoreSubProtocol": True,
