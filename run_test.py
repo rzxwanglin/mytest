@@ -24,6 +24,13 @@ res =requests.post(url=req_info['url'],headers=req_info['headers'],data=req_info
 print(res.text)
 
 
+task = 'like_inter'
+cookie_obj['media_id'] ='3393245210130807279'
+req_info= RequestFactory.make_request_like_inter(task,cookie_obj)
+print(req_info)
+res =requests.post(url=req_info['url'],headers=req_info['headers'],data=req_info['body'],proxies=proxy)
+print(res.text)
+
 
 # res = requests.get('http://127.0.0.1:5003/api/get/cookie')
 # print(res.json())

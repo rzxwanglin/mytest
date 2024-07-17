@@ -30,7 +30,7 @@ class Template:
     @classmethod
     def user_template(cls):
         return {
-            "url": "https://www.instagram.com/api/v1/users/web_profile_info/?username={user_name}",
+            "url": "https://www.instagram.com/api/v1/users/web_profile_info/?username=",
             "method": "GET",
             "headers": {
                 'Connection': 'keep-alive',

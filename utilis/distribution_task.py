@@ -45,6 +45,7 @@ class DistributionTask:
                 for task in tasks:
                     task_created_date = time.time()
                     task_info = {
+                        "task_id": task_infos['task_info']['id'],
                         "task_name": task  # 1、点赞2、评论3、关注4、发帖子5、采集帖子观看数量6、点赞数量
                         , "task_type": "data"  # action ,caiji
                         , "task_status": "add"  # add run end
@@ -58,18 +59,18 @@ class DistributionTask:
                     logging.info(f"拆分二级任务{task} 完成")
                     task_redis_client.lpush(config.task_data, json.dumps(task_info))
                     # 判断用户是否在表中
-                    user = json.loads(task_redis_client.hget("instagram:users", user_name))
+                    user = task_redis_client.hget("instagram:users", user_name)
                     if user:
+                        user = json.loads(user)
                         use_cookie_count = user.get("use_cookie_count", 0) + 1
                         task_count = user.get("task_count", 0) + 1
                         task_redis_client.hset("instagram:users", user_name,
                                                json.dumps(
                                                    {"use_cookie_count": use_cookie_count, "task_count": task_count}))
                     else:
-                        task_redis_client.hset("instagram:users", user,
-                                               json.dumps({"use_cookie_count": 1, "task_count": 1}))
+                        task_redis_client.hset("instagram:users", user_name,json.dumps({"use_cookie_count": 1, "task_count": 1}))
 
-                    task_redis_client.lpush(f"instagram:task:history:{user}", json.dumps(task_info))
+                    task_redis_client.lpush(f"instagram:task:history:{user_name}", json.dumps(task_info))
                 try:
                     # 生成二级任务 task_data = instagram:data:task
                     pass

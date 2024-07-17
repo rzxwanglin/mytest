@@ -130,7 +130,7 @@ def data_add_task():
                         }
     """
     task_info = {'task_info': {'id': '9470055', 'type': 'instagram','user':'',
-                              'params': {'seed': [],
+                              'params': {'seed': '',
                               'seed_type': 'user',
                               'task': [],
                               'limit': {
@@ -151,10 +151,10 @@ def data_add_task():
                                }}
     from_user_json = request.get_json()
     task_info['task_info']['user'] = from_user_json['user']
-    task_info['task_info']['params']['seed'] = [from_user_json['seed']]
-    task_info['task_info']['params']['task'] = from_user_json["task"]
+    task_info['task_info']['params']['seed'] = from_user_json['seed']
+    task_info['task_info']['params']['task'] = from_user_json["task"].split(':')
     task_redis_client.lpush(config.task_info_name, json.dumps(task_info))
-    return '任务上传完毕'
+    return jsonify(task_info)
 
 @app.route('/test',methods=['POST'])
 def test_post():
@@ -171,4 +171,4 @@ if __name__ == "__main__":
         encoding="utf-8",
         enqueue=False,
     )
-    app.run(host='0.0.0.0', port=5003, debug=True)
+    app.run(host='0.0.0.0', port=5004, debug=True)

@@ -1,4 +1,5 @@
 # -*-coding:utf-8 -*-
+import threading
 import time, random, json, copy, datetime, os
 from loguru import logger
 import setproctitle, traceback, requests
@@ -23,8 +24,11 @@ logger.add(
 
 if __name__ == "__main__":
     logger.info('run')
-    #Process(target=SpiderInteractive().run()).start()
-    Process(target=DistributionTask().run()).start()
+    threading.Thread(target=DistributionTask().run, args=()).start()
+    Process(target=SpiderInteractive().run()).start()
     Process(target=SpiderData().run()).start()
+
+    #todo 消费db2 持久化mysql
+
 
 

@@ -83,7 +83,7 @@ cookie_total_hash = attribute_str("account", "cookie_total_hash", "")
 cookie_total_zset = attribute_str("account", "cookie_total_zset", "")
 cookie_total_count_hash = attribute_str("account", "cookie_total_count_hash", "")
 acc_pw_hash = attribute_str("account", "ACC_PW_HASH", "")
-
+task_storage= attribute_str("task", "task_storage", "")
 user_agent_list = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.6167.101 Safari/537.36",
@@ -125,6 +125,8 @@ data_redis_client = CRedisHandler(host=DATA_DB_CONFIG['ip'], port=DATA_DB_CONFIG
 
 TASK_DB_CONFIG = attribute_json( "REDIS-TASK", "CONFIG", {})
 task_redis_client = CRedisHandler(host=TASK_DB_CONFIG['ip'], port=TASK_DB_CONFIG["port"], db=TASK_DB_CONFIG["db"],password=TASK_DB_CONFIG["password"])
+TASK_DB_CONFIG2 = attribute_json( "REDIS-TASK", "CONFIG2", {})
+storage_redis_client = CRedisHandler(host=TASK_DB_CONFIG2['ip'], port=TASK_DB_CONFIG2["port"], db=TASK_DB_CONFIG2["db"],password=TASK_DB_CONFIG2["password"])
 
 
 use_proxy = attribute_bool('PROXY','USE_PROXY', False)

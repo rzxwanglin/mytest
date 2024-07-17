@@ -35,11 +35,8 @@ class RequestFactory:
 
     @classmethod
     def make_user_request(cls, task, cookie_obj,user_name):
-        if not isinstance(cookie_obj, dict):
-            cookie_obj = json.loads(cookie_obj)
         req_info = copy.deepcopy(Template.template().get(task))
-        req_info["headers"]["Cookie"] = cookie_obj['cookie']
-        req_info["url"] = req_info["url"].format(**{"user_name": user_name})
+        req_info["url"] = req_info["url"]+user_name
         return req_info
 
     @classmethod
