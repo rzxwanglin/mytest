@@ -25,8 +25,8 @@ logger.add(
 if __name__ == "__main__":
     logger.info('run')
     threading.Thread(target=DistributionTask().run, args=()).start()
-    Process(target=SpiderInteractive().run()).start()
-    Process(target=SpiderData().run()).start()
+    threading.Thread(target=SpiderInteractive().run, args=()).start()
+    threading.Thread(target=SpiderData().run, args=()).start()
 
     #todo 消费db2 持久化mysql
 

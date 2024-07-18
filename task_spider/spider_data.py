@@ -6,6 +6,7 @@ from loguru import logger
 from config import task_redis_client
 from config import storage_redis_client
 from utilis.account_redis_interface import AccountRedisInterface
+from utilis.distribution_task import DistributionTask
 from request_factory import RequestFactory
 class SpiderData(object):
     """
@@ -13,6 +14,10 @@ class SpiderData(object):
     """
     def __init__(self):
         logger.info('初始化instagram数据爬虫')
+
+    def post_parse(self, task_info):
+        pass
+
 
     def get_task(self):
         while True:
@@ -66,6 +71,10 @@ class SpiderData(object):
                         'task_result':response
                     }
                     storage_redis_client.lpush(config.task_storage+task_info.get('task_name'),json.dumps(result))
+                    if task_info.get('task_name') == 'user':
+                        seed = ''
+                        for task_ in ['follower','following','comment','liked']:
+                            DistributionTask().distribute_task(task_info,task_,seed)
 
                 else:
                     # 任务回滚！
@@ -75,6 +84,8 @@ class SpiderData(object):
 
             except Exception as e:
                 logger.error(e)
+                logger.info(f"任务{task_info.get('task_name')} 异常回滚！")
+                task_redis_client.lpush(config.task_data, json.dumps(task_info))
             time.sleep(2)
 
 

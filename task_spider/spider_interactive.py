@@ -4,6 +4,7 @@ import requests
 import config
 from loguru import logger
 from config import task_redis_client
+from config import storage_redis_client
 from utilis.account_redis_interface import AccountRedisInterface
 from request_factory import RequestFactory
 class SpiderInteractive(object):
@@ -49,11 +50,17 @@ class SpiderInteractive(object):
                 task_statue, task_info, response = self.get_handler()
                 if task_statue:
                     logger.info(f"任务{task_info.get('task_name')} 执行完成！，完成响应：{response}")
+                    result = {
+                        'task_info': task_info,
+                        'task_result': response
+                    }
+                    storage_redis_client.lpush(config.task_storage + task_info.get('task_name'), json.dumps(result))
                 else:
                     # 任务回滚！
                     # todo 判断是否是账号失效，如果是账号失效要redis 直接删除 instagram_cookie_total_hash 中对应多key  以及instagram_cookie_total_zest 中多key
                     logger.info(f"任务{task_info.get('task_name')} 异常回滚！")
                     task_redis_client.lpush(config.task_inter, json.dumps(task_info))
+
             except Exception as e:
                 logger.error(e)
             time.sleep(2)

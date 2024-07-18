@@ -1,82 +1,12 @@
-import threading
-import time
+import requests
+import urllib.parse
 
-import websocket
+url = "https://www.instagram.com/graphql/query"
 
-# socket访问地址：
-socket_add = "wss://edge-chat.instagram.com/chat?sid=5545895126892543&cid=68195496-689d-41f3-8922-476697a727e2"
-
-def on_message(ws, message):
-    print(f"接收到消息：{message}")
-
-
-def on_error(ws, error):
-    # 程序报错时，就会触发on_error事件
-    print(error)
+# Original payload string
+payload = 'av=17841467445384268&__d=www&__user=0&__a=1&__req=1p&__hs=19922.HYP%3Ainstagram_web_pkg.2.1..0.1&dpr=1&__ccg=UNKNOWN&__rev=1014969124&__s=u06wne%3Azc0o5u%3Ayk12ho&__hsi=7392864625711762219&__dyn=7xeUjG1mxu1syUbFp41twpUnwgU7SbzEdF8aUco2qwJxS0k24o0B-q1ew65xO0FE2awpUO0n24oaEnxO1ywOwv89k2C1Fwc60AEC1TwQzXwae4UaEW2G0AEcobEaU2eUlwhEe87q7U1bobpEbUGdwtUd-2u2J0bS1LwTwKG1pg2fwxyo6O1FwlEcUed6goK2OubxKi2qi7ErwYCz8rwHw&__csr=gkMxMx2Yyf1lf9EYQ9ZRW5FYy9EyEN5raAjbnjbyfh6lkmQniJiGimV4nuF97hFvjJfKTiHzpk-OOdmm9V5HGaBJkjBy4dKmp5iz-qF4mujxqup6UDJaagybyrjCG8hVK8hoB2VuuqiuiupfxGi48xdeeg-amEynw05qBwZzFA9DAwHCo-2l0f65vwPwj2o3eg0gPw1HFxe310WhFT8dxgldwg86LEyx51i18w2TU62unk8G2l0Ezi0WxS8Upw5ixi0zCnBgG1Jw53Bxd025oG0xU2qwkcM725US00zS8&__comet_req=7&fb_dtsg=NAcM7GHys1foIT8KnRsIH-LQq87m6rVPa3Rt6XAeb-BLuPfQx6ith5Q%3A17854231342124680%3A1721285421&jazoest=26082&lsd=6LsNeBAifXat1-OhtPxgvy&__spin_r=1014969124&__spin_b=trunk&__spin_t=1721285429&fb_api_caller_class=RelayModern&fb_api_req_friendly_name=PolarisProfilePostsTabContentDirectQuery_connection&variables=%7B%22after%22%3Anull%2C%22before%22%3Anull%2C%22data%22%3A%7B%22count%22%3A12%2C%22include_relationship_info%22%3Atrue%2C%22latest_besties_reel_media%22%3Atrue%2C%22latest_reel_media%22%3Atrue%7D%2C%22first%22%3A12%2C%22last%22%3Anull%2C%22username%22%3A%22georgerussell63%22%2C%22__relay_internal__pv__PolarisFeedShareMenurelayprovider%22%3Afalse%7D&server_timestamps=true&doc_id=8026303397430981'
+# Convert the payload to a dictionary
+payload_dict = dict(urllib.parse.parse_qsl(payload))
 
 
-def on_close(ws, param1, param2):
-    print("Connection closed------")
-
-
-def on_open(ws):
-    ws.send(build_message("CONNECT", {"passcode": "", "accept-version": "1.0,1.1,1.2", "heart-beat": "5000,0"}))
-    time.sleep(2)
-    topic = "xxxxx"
-    ws.send(build_message("SUBSCRIBE", {"id": "sub-0", "destination": topic}))
-
-    # 启动心跳检测任务
-    thread = threading.Thread(target=check_heartbeat, args=[ws])
-    thread.start()
-
-
-def check_heartbeat(ws):
-    while True:
-        time.sleep(5)
-        ws.send(build_message("SEND", ''))
-        print(f"心跳发送成功-------")
-
-
-# 按照消息格式定义消息内容
-def build_message(command, headers, msg=None):
-    BYTE = {
-        'LF': '\x0A',
-        'NULL': '\x00',
-        'HIDDEN': '\u0001'
-    }
-    data_arr = [command + BYTE['LF']]
-
-    # add headers
-    for key in headers:
-        data_arr.append(key + ":" + headers[key] + BYTE['LF'])
-
-    data_arr.append(BYTE['LF'])
-
-    # add message, if any
-    if msg is not None:
-        data_arr.append(msg)
-
-    # terminate with null octet
-    data_arr.append(BYTE['NULL'])
-
-    frame = ''.join(data_arr)
-
-    # transmit over ws
-    print("构建后数据：" + frame)
-
-    return frame
-
-
-def main(address=socket_add):
-    websocket.enableTrace(False)
-    ws = websocket.WebSocketApp(address,
-                                cookie="xxxxx",
-                                on_message=on_message,
-                                on_error=on_error,
-                                on_close=on_close,
-                                on_open=on_open)
-    ws.run_forever(ping_interval=5, ping_timeout=3)
-
-
-if __name__ == "__main__":
-    main()
+print(payload_dict)
