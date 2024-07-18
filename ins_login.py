@@ -31,31 +31,12 @@ class AliexpressSlider():
         self.header = header
 
         self.ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.96 Safari/537.36'
-        # self.proxy = "http://10.11.203.70:50019"
-        self.proxy = "http://127.0.0.1:7890"
 
-    def get_proxy_ua(self):
-        proxy_list = copy.deepcopy(config.token_proxy_list)
-        ua_list = copy.deepcopy(config.user_agent_list)
-        in_use_account_key = client.hkeys(config.token_cookie_hash)
-        for cookie_key in in_use_account_key:
-            cookie_detail = json.loads(client.hget(config.token_cookie_hash, cookie_key))
-            if cookie_detail.get("proxy") in proxy_list:
-                proxy_list.remove(cookie_detail.get("proxy"))  # 代理不重复在cookie中使用
-            # if cookie_detail.get("user-agent") in ua_list:
-            #     ua_list.remove(cookie_detail.get("user-agent"))  # 代理不重复在cookie中使用
-        return proxy_list, ua_list, in_use_account_key
 
     def create_browser(self):
         logger.info("初始化 browser")
         chrome_options = webdriver.ChromeOptions()
-        # prefs = {
-        #     'profile.default_content_setting_values': {
-        #         'images': 2,  # 禁用图片的加载
-        #         'javascript': 2  # 禁用js，可能会导致通过js加载的互动数抓取失效
-        #     }
-        # }
-        # chrome_options.add_experimental_option("prefs", prefs)
+
         chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
         # chrome_options.add_argument('blink-settings=imagesEnabled=false')  # 无图模式
         # if self.header:
@@ -320,39 +301,6 @@ class AliexpressSlider():
                 client.hset("instagram_google_verify_fail", acc_hkey, 1)
                 logger.error("谷歌验证失败， tooken存入谷歌验证失败队列， 等待手动验证")
 
-
-    # def convert_wav(self, mp3_binary_data):
-    #     # 使用 BytesIO 将二进制数据包装成文件对象
-    #     mp3_io = io.BytesIO(mp3_binary_data)
-    #
-    #     # 读取MP3文件
-    #     audio = AudioSegment.from_mp3(mp3_io)
-    #
-    #     # 指定输出WAV文件名
-    #     wav_file = "output.wav"
-    #
-    #     # 将MP3文件保存为WAV文件
-    #     audio.export(wav_file, format="wav")
-    #
-    #     logger.info(f"已将MP3转换为{wav_file}")
-
-    # def convert_text(self):
-    #     try:
-    #         # 转换音频格式
-    #         sound = AudioSegment.from_mp3(r"output.wav")
-    #         time.sleep(2)
-    #         sound.export("audio.wav", format="wav")
-    #
-    #         # 读取音频文件
-    #         r = sr.Recognizer()
-    #         with sr.AudioFile('audio.wav') as source:
-    #             audio_text = r.record(source)
-    #             # 语音识别
-    #             return r.recognize_google(audio_text, language='en-US')
-    #     except:
-    #         return
-
-
     def ins_login(self, acc_hkey):
         self.login(acc_hkey)
         page_source = self.browser.page_source
@@ -369,63 +317,23 @@ class AliexpressSlider():
                 logger.error("谷歌验证失败， tooken存入谷歌验证失败队列， 等待手动验证")
 
     def get_account(self):
-        total_hkeys = client.hkeys(config.token_count_hash.format("total"))
+        total_hkeys = client.hkeys(config.login_token_account_hash)
         for acc_hkey in total_hkeys:
-            data = json.loads(client.hget(config.token_count_hash.format("total"), acc_hkey))
-            fail_count = data.get("fail_count")
-            if fail_count > 3:
-                logger.info(f"当前验证账号使用情况如下： {acc_hkey}, {json.dumps(data, ensure_ascii=False)}")
-                cookie = client.hget("instagram_cookie_hash", acc_hkey)
-                if client.hget("instagram_google_verify_fail", acc_hkey):
-                    continue
-                if cookie:
-                    return acc_hkey, json.loads(cookie)
-                else:
-                    return acc_hkey, {
-                            "cluster_id": data.get("cluster_id"),
-                            "proxy": random.choice(config.token_proxy_list),
-                            "user-agent": random.choice(config.user_agent_list),
-                            "cookie": "",
-                            "csrf_token": ""
-                        }
-
-        login_token = client.hkeys(config.login_token_account_hash)
-        for acc_hkey in login_token:
-            fail_hash = client.hget("instagram_cookie_fail_hash", acc_hkey)
-            total_hash = client.hget(config.token_total_hash, acc_hkey)
-            cookie_hash = client.hget(config.token_cookie_hash, acc_hkey)
-            if fail_hash or total_hash or cookie_hash:
-                continue
-            if client.hget("instagram_google_verify_fail", acc_hkey):
-                continue
-            proxy, ua, _ = self.get_proxy_ua()
-            cookie = {
-                # "proxy": random.choice(proxy),
-                "cluster_id": int(client.hget(config.login_token_account_hash, acc_hkey)),
-                "user-agent": random.choice(ua),
-                "cookie": "",
-                "csrf_token":""
-            }
-            return acc_hkey, cookie
-
-        if len(client.hkeys(config.token_total_hash)) < 20:
-            acc_keys = client.hkeys(config.acc_pw_hash)
-            if len(acc_keys) <= 0:
-                logger.error("注册登录队列 账号不足")
+            statue = json.loads(client.hget(config.login_token_account_hash, acc_hkey))
+            if str(statue) == '1':
+                logger.info(f"当前验证账号使用情况如下：需要登陆{acc_hkey}")
+                cookie = {
+                    "statue": int(client.hget(config.login_token_account_hash, acc_hkey)),
+                    "user-agent": random.choice(config.user_agent_list),
+                    "cookie": "",
+                    "csrf_token": ""
+                }
+                return acc_hkey, cookie
+            elif str(statue) == '2':
                 return "", {}
-            acc_hkey = random.choice(acc_keys)
-            proxy, ua, _ = self.get_proxy_ua()
-            cookie = {
-                # "proxy": random.choice(proxy),
-                "cluster_id": int(client.hget(config.acc_pw_hash, acc_hkey)),
-                "user-agent": random.choice(ua),
-                "cookie": "",
-                "csrf_token": ""
-            }
-            if client.hget("instagram_google_verify_fail", acc_hkey):
+            else:
                 return "", {}
-            return acc_hkey, cookie
-        return "", {}
+
 
     def verify_2fa(self, acc_hkey):
         logger.info(f"开始instagram 2fa验证, {acc_hkey}")
@@ -506,7 +414,7 @@ class AliexpressSlider():
         try:
             self.create_browser()
             self.browser.get("https://www.instagram.com")
-            time.sleep(3)
+            time.sleep(10)
             if not cookie.get("cookie") or cookie.get("cookie") == "":        # cookie为空，则为账号密码登录
                 cookie_str = ""
                 self.ins_login(acc_hkey)
@@ -514,7 +422,7 @@ class AliexpressSlider():
                 cookie_str = cookie.get("cookie", "")
                 logger.info(f"开始注入cookie登录 account: {acc_hkey}")
                 self.cookie_login(cookie_str)
-            time.sleep(3)
+            time.sleep(10)
             message = self.judge_page()
             if message == "二次验证":
                 try:
@@ -522,9 +430,8 @@ class AliexpressSlider():
                 except:
                     client.hset("instagram_google_verify_fail", acc_hkey, "2fa验证异常")
                     logger.error(f"2fa验证失败， error: {traceback.format_exc()}")
-
             self.browser.refresh()
-            time.sleep(3)
+            time.sleep(10)
             # 验证账号是否出现掉线，验证，被封情况
             message = self.judge_page()
             logger.info(f"账号状态为： {message}")
@@ -558,7 +465,7 @@ class AliexpressSlider():
                     logger.error("谷歌验证失败， tooken存入谷歌验证失败队列， 等待手动验证")
             if "accounts/onetap" in self.browser.current_url and "保存你的登录信息" in self.browser.page_source:
                 self.browser.get("https://www.instagram.com")
-                time.sleep(5)
+                time.sleep(10)
             self.account_judge(acc_hkey, cookie)
         except:
             logger.info("error: " + traceback.format_exc())
@@ -691,15 +598,12 @@ class AliexpressSlider():
 
     def run(self):
         acc_hkey, cookie = self.get_account()
-        # acc_hkey, cookie = "camilaq6ph@gmx.com:Si5KSYCc50", {}
         if acc_hkey == "":
             logger.info("暂无token验证")
             return
-        proxy = random.choice(["10.11.203.70:50002", "10.11.203.70:50025", "10.11.203.70:50014", "10.11.203.70:50005", "10.11.203.70:50023", "10.11.203.70:50028"])
         ua = cookie.get("user-agent", 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.96 Safari/537.36')
-        self.proxy = "http://" + proxy
         self.ua = ua
-        logger.info(f"account: {acc_hkey}, proxy: {self.proxy}")
+        logger.info(f"account: {acc_hkey}")
         if len(acc_hkey.split(":")) > 3:
             self.instagram_login(acc_hkey, cookie)
         # else:

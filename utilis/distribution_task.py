@@ -40,6 +40,7 @@ class DistributionTask:
             tasks = params['task']
             limit = params['limit']
             for task in tasks:
+
                 task_created_date = time.time()
                 task_info = {
                     "task_id": task_infos['task_info']['id'],
@@ -95,6 +96,9 @@ class DistributionTask:
                 tasks = params['task']
                 limit = params['limit']
                 for task in tasks:
+                    if task == '' or task in ['follower', 'following', 'comment', 'liked']:
+                        continue
+
                     task_created_date = time.time()
                     task_info = {
                         "task_id": task_infos['task_info']['id'],

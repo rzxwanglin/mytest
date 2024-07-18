@@ -78,14 +78,15 @@ class SpiderData(object):
 
                 else:
                     # 任务回滚！
+                    logger.error(response)
                     # todo 判断是否是账号失效，如果是账号失效要redis 直接删除 instagram_cookie_total_hash 中对应多key  以及instagram_cookie_total_zest 中多key
                     logger.info(f"任务{task_info.get('task_name')} 异常回滚！")
-                    task_redis_client.lpush(config.task_data, json.dumps(task_info))
+                    task_redis_client.rpush(config.task_data, json.dumps(task_info))
 
             except Exception as e:
                 logger.error(e)
                 logger.info(f"任务{task_info.get('task_name')} 异常回滚！")
-                task_redis_client.lpush(config.task_data, json.dumps(task_info))
+                task_redis_client.rpush(config.task_data, json.dumps(task_info))
             time.sleep(2)
 
 

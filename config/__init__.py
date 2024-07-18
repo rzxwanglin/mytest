@@ -137,3 +137,9 @@ task_inter = attribute_str('task','task_inter','')
 task_data = attribute_str('task','task_data','')
 instagram_users = attribute_str('task','instagram_users','')
 task_info_name = attribute_str('task','task_info_name','')
+
+
+
+token_total_hash = attribute_str("account", "TOKEN_TOTAL_HASH", "")
+token_cookie_hash = attribute_str("account", "COOKIE_HASH", "")
+token_count_hash = attribute_str("account","TOKEN_COUNT_HASH",'')

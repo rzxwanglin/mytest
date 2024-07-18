@@ -21,6 +21,9 @@ class AccountRedisInterface:
     def __init__(self):
         self.client = account_redis_client
 
+    def add_account(self,account,user):
+        self.client.hset(config.login_token_account_hash,account,user)
+
     def get_account(self):
         account = self.client.keys(config.login_token_account_hash)
         return account
