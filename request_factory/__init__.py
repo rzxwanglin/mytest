@@ -52,7 +52,9 @@ class RequestFactory:
         return req_info
 
     @classmethod
-    def make_post_id_request(cls, task_info: dict, task: any, post_id: string, meta: dict, spider_self: Any):
+    def make_post_id_request(cls,task: any, cookie_obj,post_id):
+        if not isinstance(cookie_obj, dict):
+            cookie_obj =json.loads(cookie_obj)
         req_info = copy.deepcopy(Template.template().get(task))
         lsd = cls.get_lsd()
         csrftoken = cls.get_csrftoken()
@@ -62,11 +64,10 @@ class RequestFactory:
         })
         req_info["headers"]["x-csrftoken"] = csrftoken
         req_info["headers"]["x-fb-lsd"] = lsd
-        return FormRequest(
-            dont_filter=True,
-            meta=meta,
-            **req_info
-        )
+        req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
+        return req_info
 
     @classmethod
     def make_search_request(cls, task_info: dict, task: any, keyword: string, meta: dict, spider_self: Any):
@@ -92,22 +93,44 @@ class RequestFactory:
     def make_follower_request(cls, task, cookie_obj: Any,userid):
         if not isinstance(cookie_obj, dict):
             cookie_obj = json.loads(cookie_obj)
+        # req_info = copy.deepcopy(Template.template().get(task))
+        # req_info["url"]= req_info["url"].replace('{userid}',userid)
+        # req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        # req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        # req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
+        lsd = cls.get_lsd()
         req_info = copy.deepcopy(Template.template().get(task))
-        req_info["url"]= req_info["url"].replace('{userid}',userid)
-        req_info["headers"]["Cookie"] = cookie_obj['cookie']
-        req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
-        req_info["headers"]["X-Csrftoken"] = cookie_obj['csrf_token']
+        # after = task_info.get("sub_end_cursor")
+        variables = '{"include_reel":false,"fetch_mutual":true,"first":50,"id":"' + userid + '"}'
+        # if task_info.get("sub_page", 1) > 1:
+        #     variables = '{"include_reel":false,"fetch_mutual":true,"first":50,"id":"' + user_id + '","after":"' + after + '"}'
+        req_info["url"] = req_info["url"].format(**{"variables": quote(variables)})
+        req_info["headers"]["x-fb-lsd"] = lsd
+        #req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        #req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        #req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
         return req_info
 
     @classmethod
     def make_following_request(cls, task, cookie_obj: Any,userid):
         if not isinstance(cookie_obj, dict):
             cookie_obj = json.loads(cookie_obj)
+        # req_info = copy.deepcopy(Template.template().get(task))
+        # req_info["url"] = req_info["url"].replace('{userid}', userid)
+        # req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        # req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        # req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
+        lsd = cls.get_lsd()
         req_info = copy.deepcopy(Template.template().get(task))
-        req_info["url"] = req_info["url"].replace('{userid}', userid)
-        req_info["headers"]["Cookie"] = cookie_obj['cookie']
-        req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
-        req_info["headers"]["X-Csrftoken"] = cookie_obj['csrf_token']
+        # after = task_info.get("sub_end_cursor")
+        variables = '{"include_reel":false,"fetch_mutual":true,"first":50,"id":"' + userid + '"}'
+        # if task_info.get("sub_page", 1) > 1:
+        #     variables = '{"include_reel":false,"fetch_mutual":true,"first":50,"id":"' + user_id + '","after":"' + after + '"}'
+        req_info["url"] = req_info["url"].format(**{"variables": quote(variables)})
+        req_info["headers"]["x-fb-lsd"] = lsd
+        #req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        #req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        #req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
         return req_info
 
     @classmethod

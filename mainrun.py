@@ -103,7 +103,7 @@ def inter_add_task():
     task_redis_client.lpush(f"instagram:task:history:{user_name}", json.dumps(task_info))
 
 
-    return '任务上传完毕'
+    return jsonify(task_info)
 
 @app.route('/api/data/addtask', methods=['POST'])
 def data_add_task():

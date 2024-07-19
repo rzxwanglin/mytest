@@ -29,41 +29,44 @@ class SpiderData(object):
 
     def get_handler(self):
         data_dict = self.get_task()
-        task_name = data_dict['task_name']
-        seed = data_dict.get("seed", None)
-        if task_name not in ['user']:
-            cookie_obj = AccountRedisInterface().get_cookie()
-            if not cookie_obj:
+        try:
+            task_name = data_dict['task_name']
+            seed = data_dict.get("seed", None)
+            if task_name not in ['user']:
+                cookie_obj = AccountRedisInterface().get_cookie()
+                if not cookie_obj:
+                    return False, data_dict, None
+            else:
+                cookie_obj = None
+            if task_name in ["liked"]:
+                # todo post_id
+                post_id = data_dict.get("source_post", {}).get("id")
+                req_info = RequestFactory.factory()[task_name](task_name, cookie_obj, post_id)
+            elif task_name in ["comment", "post", "user", "following", "follower", "hashtag", "search", "post_id"]:
+                req_info = RequestFactory.factory()[task_name](task_name, cookie_obj, seed)
+            else:
                 return False, data_dict, None
-        else:
-            cookie_obj = None
-        if task_name in ["liked"]:
-            # todo post_id
-            post_id = data_dict.get("source_post", {}).get("id")
-            req_info = RequestFactory.factory()[task_name](task_name, cookie_obj, post_id)
-        elif task_name in ["comment", "post", "user", "following", "follower", "hashtag", "search", "post_id"]:
-            req_info = RequestFactory.factory()[task_name](task_name, cookie_obj, seed)
-        else:
+            # todo 优化代码
+            if config.use_proxy:
+                proxie = config.proxies
+                res =requests.request(method=req_info['method'],url=req_info['url'],headers=req_info['headers'],data=req_info.get('body',''),proxies=proxie)
+
+            else:
+                res = requests.request(method=req_info['method'], url=req_info['url'], headers=req_info['headers'],
+                                       data=req_info.get('body', ''))
+
+            if res.status_code == 200 and '"status":"ok"' in res.text and '请稍等几分钟再试' not in res.text:
+                return True,data_dict,res.text
+            else:
+                logger.error("!!任务执行异常！！")
+                return False,data_dict,None
+        except:
             return False, data_dict, None
-        # todo 优化代码
-        if config.use_proxy:
-            proxie = config.proxies
-            res =requests.request(method=req_info['method'],url=req_info['url'],headers=req_info['headers'],data=req_info.get('body',''),proxies=proxie)
-
-        else:
-            res = requests.request(method=req_info['method'], url=req_info['url'], headers=req_info['headers'],
-                                   data=req_info.get('body', ''))
-
-        if res.status_code == 200 and '"status":"ok"' in res.text:
-            return True,data_dict,res.text
-        else:
-            logger.error("!!任务执行异常！！")
-            return False,data_dict,None
 
     def run(self):
         while True:
+            task_statue, task_info, response = self.get_handler()
             try:
-                task_statue, task_info, response = self.get_handler()
                 if task_statue:
                     logger.info(f"任务{task_info.get('task_name')} 执行完成！，完成响应：{response}")
                     result ={
@@ -72,9 +75,11 @@ class SpiderData(object):
                     }
                     storage_redis_client.lpush(config.task_storage+task_info.get('task_name'),json.dumps(result))
                     if task_info.get('task_name') == 'user':
-                        seed = ''
-                        for task_ in ['follower','following','comment','liked']:
-                            DistributionTask().distribute_task(task_info,task_,seed)
+                        tasks_ =task_info.get('father_task')['task_info']['params']['task']
+                        seed = json.loads(response)['data']['user']['id']
+                        for task_ in tasks_:
+                            if task_ in ['follower','following','comment','liked']:
+                                DistributionTask().distribute_task(task_info,task_,seed)
 
                 else:
                     # 任务回滚！

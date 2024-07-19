@@ -126,7 +126,7 @@ class Template:
                 'sec-fetch-site': 'same-origin',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
                 'viewport-width': '979',
-                # 'x-csrftoken': tok,
+                 'x-csrftoken': 'tok',
                 # 'x-fb-lsd': lsd,
                 'x-ig-app-id': '936619743392459'
             },
@@ -156,40 +156,7 @@ class Template:
     @classmethod
     def follower_template(cls):
         return {
-            "url":  "https://www.instagram.com/api/v1/friendships/{userid}/followers/?count=12&search_surface=follow_list_page",
-            "method": "GET",
-            "headers": {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-                'sec-ch-ua-model': '""',
-                'x-ig-app-id': '936619743392459',
-                'sec-ch-ua-mobile': '?0',
-                'x-bloks-version-id': '213c82555f99bb0cecb045c627a22f08209d7a699fc238c7e73a0482e70267f9',
-                'x-fb-lsd': '6UrRZwaUXr24urfM08N1Zb',
-                'sec-ch-ua-platform-version': '"10.0.0"',
-                'x-fb-friendly-name': 'PolarisProfilePostsTabContentDirectQuery_connection',
-                'x-asbd-id': '129477',
-                'sec-ch-ua-full-version-list': '"Not/A)Brand";v="8.0.0.0", "Chromium";v="126.0.6478.127", "Google Chrome";v="126.0.6478.127"',
-                'sec-ch-prefers-color-scheme': 'light',
-                'X-Csrftoken': '14DMZwBOL8EbgKRQTKyyVurdnOv8SjOL',
-                'sec-ch-ua-platform': '"Windows"',
-                'origin': 'https://www.instagram.com',
-                'sec-fetch-site': 'same-origin',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-dest': 'empty',
-                'referer': 'https://www.instagram.com/leomessi/',
-                'accept-language': 'zh-CN,zh;q=0.9',
-                'priority': 'u=1, i',
-                'Cookie': 'mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; csrftoken=14DMZwBOL8EbgKRQTKyyVurdnOv8SjOL; ds_user_id=66881971457; shbid="3441\\05466881971457\\0541752544811:01f7a6c74b853375ad25c9e687be530eec06197f673ca3d78e4bddb3ca8d0b14fffa4eb1"; shbts="1721008811\\05466881971457\\0541752544811:01f74ea4bd4f2d3c92b4b3cf8fb860d26c641fd7096946e9efe64481a3fab7351a7fc475"; sessionid=66881971457%3A8HydLZs19zsNLX%3A21%3AAYfuOxpOKttsAb5y03fQEpsehxGDNDNEPSwM0eS8Iaw; wd=1224x675; rur="CCO\\05466881971457\\0541752732472:01f7909d08d1f1d8a827220c9fc20a5f4e5f038bc6aa285dc522dc04916ac4f44a034a13"; csrftoken=NcpnPEpVnHl4lU0VdfF3r7GaYbLSgJxe; ds_user_id=66881971457; ig_did=4A4975E2-6FB1-49DE-964C-364FFEBBAAB6; ig_nrcb=1; mid=ZmpVpQALAAHbZz7Di09C11gTIg8a; rur="CCO\\05466881971457\\0541752804738:01f7ea21cb6afca72448b6a93f1ca5cdc7efaf8b564f8dc42673c78c3c036467a798d5a9"; sessionid=66881971457%3A8HydLZs19zsNLX%3A21%3AAYcLBFHeW22Bq9T3yMuwnlxMy1dc2YIL8OxJ02s-vu4; shbid="3441\\05466881971457\\0541752737312:01f7ad0e6b8709af249bb17e3ddd71875e2520dce922ec14f5e525c7c1a463268822f50d"; shbts="1721201312\\05466881971457\\0541752737312:01f74f45c18eab648167a3192e8c95a97778b8ef861b5c7d19e754ab61ed75242b394acc"'
-            },
-
-        }
-
-    @classmethod
-    def following_template(cls):
-        return {
-            "url": "https://www.instagram.com/api/v1/friendships/{userid}}/following/?count=20&max_id=46",
+            "url": "https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={variables}",
             "method": "GET",
             "headers": {
                 'Connection': 'keep-alive',
@@ -198,11 +165,32 @@ class Template:
                 'accept-language': 'zh-CN,zh;q=0.9',
                 'cache-control': 'no-cache',
                 'pragma': 'no-cache',
+                'cookie': 'mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; shbid="3441\05466881971457\0541752820702:01f7305537ca37ee6ffb0ed0d96d35a71355631dff8d7036c05c3576c465ab9b1a4b9817"; shbts="1721284702\05466881971457\0541752820702:01f76319f9e89e7168f409bbe26d6f1fa0dbf46c1a12889dec1a4ae74e78226f6c0326b0"; ds_user_id=67554144179; csrftoken=9Jz2OAPTgBcLUoApxh9NbT70fuFEWUvg; sessionid=67554144179%3AMcVbWHHEnnPTkE%3A26%3AAYdT03HyIMkhfXEEwIZNO88gyv2XoP3V8ZC0OCZLfA; wd=1920x919; rur="NHA\05467554144179\0541752827062:01f7a59817276ee277778b58425dccde91094bca7d27614e7dd5bce88063dea60e1c111d"',
                 'referer': 'https://www.instagram.com',
                 'sec-fetch-site': 'same-origin',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
             },
         }
+
+    @classmethod
+    def following_template(cls):
+        return {
+            "url": "https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables={variables}",
+            "method": "GET",
+            "headers": {
+                'Connection': 'keep-alive',
+                'authority': 'www.instagram.com',
+                'accept': '*/*',
+                'accept-language': 'zh-CN,zh;q=0.9',
+                'cache-control': 'no-cache',
+                'pragma': 'no-cache',
+                'cookie':'mid=Zmev2gALAAGx-m_pV0MGi938YII1; ig_did=8900DF60-BB30-4397-A184-49B26FA282B8; datr=2q9nZo279aFvIwMpodLj4i8K; ig_nrcb=1; ps_n=1; ps_l=1; shbid="3441\05466881971457\0541752820702:01f7305537ca37ee6ffb0ed0d96d35a71355631dff8d7036c05c3576c465ab9b1a4b9817"; shbts="1721284702\05466881971457\0541752820702:01f76319f9e89e7168f409bbe26d6f1fa0dbf46c1a12889dec1a4ae74e78226f6c0326b0"; ds_user_id=67554144179; csrftoken=9Jz2OAPTgBcLUoApxh9NbT70fuFEWUvg; sessionid=67554144179%3AMcVbWHHEnnPTkE%3A26%3AAYdT03HyIMkhfXEEwIZNO88gyv2XoP3V8ZC0OCZLfA; wd=1920x919; rur="NHA\05467554144179\0541752827062:01f7a59817276ee277778b58425dccde91094bca7d27614e7dd5bce88063dea60e1c111d"',
+                'referer': 'https://www.instagram.com',
+                'sec-fetch-site': 'same-origin',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            },
+        }
+
 
     @classmethod
     def hashtag_template(cls):

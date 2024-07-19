@@ -16,7 +16,7 @@ from flask_sqlalchemy import SQLAlchemy
 # 获取当前工作目录
 current_path = os.getcwd()
 
-CONFIG_DIR =current_path+'/config/'
+CONFIG_DIR =current_path+'\config\\'
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.cfg")  # config.cfg文件路径
 logger.info(f'初始化配置路径：{CONFIG_PATH}')
 CONFIG_OBJ = configparser.ConfigParser()
