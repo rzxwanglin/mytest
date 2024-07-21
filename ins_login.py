@@ -1,3 +1,4 @@
+import logging
 import sys, os
 current_path = os.getcwd()
 
@@ -329,10 +330,7 @@ class AliexpressSlider():
                     "csrf_token": ""
                 }
                 return acc_hkey, cookie
-            elif str(statue) == '2':
-                return "", {}
-            else:
-                return "", {}
+        return "", {}
 
 
     def verify_2fa(self, acc_hkey):
@@ -380,6 +378,8 @@ class AliexpressSlider():
 
 
     def set_cookie(self, acc_hkey, cookie_info, csrf_token):
+        global is_true
+        is_true = True
         cookie_info['csrf_token'] = csrf_token
         if not cookie_info.get("cluster_id"):
             cookie_info["cluster_id"] = int(client.hget(config.login_token_account_hash, acc_hkey))
@@ -390,10 +390,12 @@ class AliexpressSlider():
             cookie_count_info["fail_type"] = ""
             cookie_count_info["verify_times"] = int(cookie_count_info.get("verify_times", 0)) + 1
             client.hset(config.token_count_hash.format("total"), acc_hkey, json.dumps(cookie_count_info))
-        if cookie_info.get("proxy"):
-            cookie_info.pop("proxy")
+
+        client.hset(config.login_token_account_hash, str(acc_hkey), '2')
         client.zadd(config.cookie_total_zset, {str(acc_hkey): time.time()})
-        client.hset(config.token_total_hash, acc_hkey, json.dumps(cookie_info))
+        client.hset(config.cookie_total_hash, str(acc_hkey), json.dumps(cookie_info))
+
+
         client.hdel(config.token_cookie_hash, acc_hkey)
         #client.hdel(config.acc_pw_hash, acc_hkey)
         client.hdel("instagram_google_verify_fail", acc_hkey)
@@ -411,6 +413,7 @@ class AliexpressSlider():
         except:
             pass
     def instagram_login(self, acc_hkey, cookie):
+        global is_true
         try:
             self.create_browser()
             self.browser.get("https://www.instagram.com")
@@ -445,39 +448,39 @@ class AliexpressSlider():
                 except:
                     client.hset("instagram_google_verify_fail", acc_hkey, "2fa验证异常")
                     logger.error(f"2fa验证失败， error: {traceback.format_exc()}")
-            elif message == "邮箱验证":
-                html = etree.HTML(self.browser.page_source)
-                email_addr = html.xpath('//*[contains(text(),"@")]/text()')[0].replace("邮箱：", "").strip()
-                email_address = acc_hkey.split(":")[2]
-                if email_addr[0] == email_address[0] and email_addr[-1] == email_address[-1] and email_addr.split("@")[-1][0] == email_address.split("@")[-1][0]:
-                    try:
-                        self.email_verify(acc_hkey)
-                        logger.info("邮箱验证成功")
-                    except:
-                        logger.info("邮箱验证失败")
-                else:
-                    self.set_fail_cookie(acc_hkey, cookie, message)
             if message == "谷歌验证" or message == "未知异常":
                 try:
                     self.google_verify()
                 except:
                     client.hset("instagram_google_verify_fail", acc_hkey, 1)
                     logger.error("谷歌验证失败， tooken存入谷歌验证失败队列， 等待手动验证")
+
             if "accounts/onetap" in self.browser.current_url and "保存你的登录信息" in self.browser.page_source:
-                self.browser.get("https://www.instagram.com")
-                time.sleep(10)
-            self.account_judge(acc_hkey, cookie)
+                logger.info('登陆成功')
+                self.account_judge(acc_hkey, cookie,'账号正常')
+            else:
+                logger.info('失败')
+                self.account_judge(acc_hkey, cookie, '')
         except:
             logger.info("error: " + traceback.format_exc())
+
+        logging.info('执行 退出')
+        if not is_true:
+            client.hset(config.login_token_account_hash, str(acc_hkey), '3')
+
+
+        self.browser.close()
+        time.sleep(1)
         self.browser.quit()
 
-    def account_judge(self, acc_hkey, cookie_info):
+    def account_judge(self, acc_hkey, cookie_info,message=''):
         cookie_str = ""
-        message = self.judge_page()
+        if message =='':
+            message = self.judge_page()
         if message == "账号正常":
             # 点击 打开通知窗口
             self.click_notice()
-            self.browser.refresh()
+            #self.browser.refresh()
             time.sleep(5)
             for cookie_ in self.browser.get_cookies():
                 cookie_str += cookie_["name"] + "=" + cookie_["value"] + "; "
@@ -486,6 +489,7 @@ class AliexpressSlider():
             partem = re.compile('\{"csrf_token":"(.*?)"\}')
             try:
                 csrf_token = re.findall(partem, html)[0]
+                logger.error(f'！！！获取到！{csrf_token}')
             except Exception as e:
                 print(e)
                 csrf_token =''
@@ -543,59 +547,6 @@ class AliexpressSlider():
         logger.info(f"登录完成后cookie: {acc_hkey}")
         time.sleep(5)
 
-
-    def instagram_register(self, acc_hkey, cookie):
-        try:
-            self.create_browser()
-            self.browser.get("https://www.instagram.com/accounts/emailsignup/")
-            time.sleep(3)
-            email_address = acc_hkey.split(":")[0]
-            email_password = acc_hkey.split(":")[1]
-            account = email_address.split("@")[0] + str(random.randint(10000, 100000))
-            password = email_password + "123"
-            acc_hkeys = email_address + ":" + email_password + ":" + acc_hkey
-            self.input_text('//input[@name="emailOrPhone"]', email_address)
-            self.input_text('//input[@name="fullName"]', email_address.split("@")[0])
-            self.input_text('//input[@name="username"]', account)
-            self.input_text('//input[@name="password"]', password)
-            self.wait.until(
-                EC.element_to_be_clickable((By.XPATH, '//button[@type="submit"]'))).click()
-            time.sleep(1)
-            # 填写生日
-            self.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, f'//span[@class="_aav3"][1]/select/option[@value="{str(random.randint(1,12))}"]'))).click()
-            time.sleep(1)
-            self.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, f'//span[@class="_aav3"][2]/select/option[@value="{str(random.randint(1,28))}"]'))).click()
-            time.sleep(1)
-            self.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, f'//span[@class="_aav3"][3]/select/option[@value="{str(random.randint(1970,2005))}"]'))).click()
-            time.sleep(1)
-            self.wait.until(EC.element_to_be_clickable(
-                (By.XPATH, f'//button[@class=" _acan _acap _acaq _acas _aj1- _ap30"]'))).click()
-            time.sleep(15)
-            try:
-                self.google_verify()
-            except:
-                self.wait.until(EC.element_to_be_clickable(
-                    (By.XPATH, f'//button[@class=" _acan _acap _acaq _acas _aj1- _ap30"]'))).click()
-            time.sleep(20)
-            email_verify_code = self.get_email_verify_code(acc_hkeys)
-            self.input_text('//input[@name="email_confirmation_code"]', email_verify_code)
-            time.sleep(1)
-            self.wait.until(EC.element_to_be_clickable(
-                (By.XPATH, f'//form[@method="POST"]/div/div/div[@role="button"]'))).click()
-            time.sleep(30)
-            client.hdel(config.acc_pw_hash, acc_hkey) # 删除账号密码队列邮箱账号，避免重复注册
-            self.account_judge(acc_hkeys, cookie)
-        except:
-            logger.error("error: " + traceback.format_exc())
-        self.browser.close()
-
-
     def run(self):
         acc_hkey, cookie = self.get_account()
         if acc_hkey == "":
@@ -613,7 +564,10 @@ class AliexpressSlider():
 
 if __name__ == '__main__':
     num = 0
+
+
     while True:
+        is_true = False
         num += 1
         logger.info(f"第{str(num)}次循环")
         try:

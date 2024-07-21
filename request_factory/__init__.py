@@ -106,9 +106,9 @@ class RequestFactory:
         #     variables = '{"include_reel":false,"fetch_mutual":true,"first":50,"id":"' + user_id + '","after":"' + after + '"}'
         req_info["url"] = req_info["url"].format(**{"variables": quote(variables)})
         req_info["headers"]["x-fb-lsd"] = lsd
-        #req_info["headers"]["Cookie"] = cookie_obj['cookie']
-        #req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
-        #req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
+        req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
         return req_info
 
     @classmethod
@@ -128,9 +128,9 @@ class RequestFactory:
         #     variables = '{"include_reel":false,"fetch_mutual":true,"first":50,"id":"' + user_id + '","after":"' + after + '"}'
         req_info["url"] = req_info["url"].format(**{"variables": quote(variables)})
         req_info["headers"]["x-fb-lsd"] = lsd
-        #req_info["headers"]["Cookie"] = cookie_obj['cookie']
-        #req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
-        #req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
+        req_info["headers"]["Cookie"] = cookie_obj['cookie']
+        req_info["headers"]["User-Agent"] = cookie_obj['user-agent']
+        req_info["headers"]["x-csrftoken"] = cookie_obj['csrf_token']
         return req_info
 
     @classmethod

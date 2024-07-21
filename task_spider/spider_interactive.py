@@ -35,7 +35,7 @@ class SpiderInteractive(object):
             res = requests.request(method=req_info['method'], url=req_info['url'], headers=req_info['headers'],
                                    data=req_info.get('body', ''))
         try:
-             userid= res.json()['user']['id']
+             userid=res.json()['data']['user']['id']
         except:
             userid =None
         return userid
@@ -62,10 +62,10 @@ class SpiderInteractive(object):
             return False, task_info, None
         task_name = task_info.get('task_name')
         task_contain =task_info.get("task_details")
-        if task_name=='click_inter':
+        if task_name == 'click_inter':
             if not isinstance(task_contain, dict):
                 task_contain = json.loads(task_contain)
-            task_contain['user_id'] = self.parse_userid(task_contain['media_id'])
+            task_contain['user_id'] = self.parse_userid(task_contain['user_id'])
         else:
             if not isinstance(task_contain, dict):
                 task_contain = json.loads(task_contain)
@@ -103,6 +103,7 @@ class SpiderInteractive(object):
 
             except Exception as e:
                 logger.error(e)
+
             time.sleep(2)
 
 
